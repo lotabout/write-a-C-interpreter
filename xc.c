@@ -10,16 +10,79 @@ enum {IMM, LC, LI, SC, SI, PUSH, JMP, JZ, JNZ, CALL, RET, ENT, ADJ, LEV, LEA,
       OR, XOR, AND, EQ, NE, LT, LE, GT, GE, SHL, SHR, ADD, SUB, MUL, DIV, MOD,
       EXIT};
 
+// tokens and classes (operators last and in precedence order)
+// copied from c4
+enum {
+  Num = 128, Fun, Sys, Glo, Loc, Id,
+  Char, Else, Enum, If, Int, Return, Sizeof, While,
+  Assign, Cond, Lor, Lan, Or, Xor, And, Eq, Ne, Lt, Gt, Le, Ge, Shl, Shr, Add, Sub, Mul, Div, Mod, Inc, Dec, Brak
+};
+
+// fields of identifier
+enum {Token, Hash, Name, Type, Class, Value, BType, BClass, BValue, IdSize};
+
 int *text, // text segment
     *data, // data segment
-    *stack; // stack
+    *stack;// stack
+
+char *src;  // pointer to source code string;
+
 
 int poolsize; // default size of text/data/stack
 int *pc, *bp, *sp, ax, cycle; // virtual machine registers
 
+int *current_id, // current parsed ID
+    *symbols,    // symbol table
+    line,        // line number of source code
+    token_val;   // value of current token (mainly for number)
 
 void next() {
-    token = 0;
+    char *last_pos;
+    int hash;
+    while (token = *src) {
+        ++src;
+
+        if (token == '\n') {
+            ++line;
+        }
+        else if (token == '#') {
+            // skip macro, because we will not support it
+            while (*src != 0 && *src != '\n') {
+                src++;
+            }
+        }
+        else if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') || (token == '_')) {
+            // parse identifier
+            last_pos = src - 1;
+            hash = token;
+
+            while ((*src >= 'a' && *src <= 'z') || (*src >= 'A' && *src <= 'Z') || (*src >= '0' && *src <= '9') || (*src == '_')) {
+                hash = hash * 147 + *src;
+                src++;
+            }
+
+            // look for existing identifier, linear search
+            current_id = symbols;
+            while (current_id[Token]) {
+                if (current_id[Hash] == hash && !memcmp((char *)current_id[Name], last_pos, src - last_pos)) {
+                    //found one, return
+                    token = current_id[Token];
+                    return;
+                }
+                current_id += IdSize;
+            }
+
+            // store new ID
+            current_id[Name] = (int)last_pos;
+            current_id[Hash] = hash;
+            token = current_id[Token] = Id;
+            return;
+        }
+
+
+        // skip empty line or comment line
+        return;
+    }
 }
 
 void expression(int level) {
@@ -78,6 +141,8 @@ int eval() {
 int main(int argc, char *argv[])
 {
     poolsize = 256 * 1024; // arbitrary size
+
+    line = 1;
 
     // allocate memory
     if (!(text = malloc(poolsize))) {
