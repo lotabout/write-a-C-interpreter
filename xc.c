@@ -5,7 +5,10 @@
 
 int token; // current token
 
-enum {LEA, IMM, LC, LI, SC, SI, JMP, CALL, RET, ENT, ADJ, LEV, PUSH, POP, JZ, JNZ, EXIT};
+// instructions
+enum {IMM, LC, LI, SC, SI, PUSH, JMP, JZ, JNZ, CALL, RET, ENT, ADJ, LEV, LEA,
+      OR, XOR, AND, EQ, NE, LT, LE, GT, GE, SHL, SHR, ADD, SUB, MUL, DIV, MOD,
+      EXIT};
 
 int *text, // text segment
     *data, // data segment
@@ -27,7 +30,7 @@ void statement() {
 
 }
 
-void eval() {
+int eval() {
     int op;
     while (1) {
         op = *pc++; // get next operation code
@@ -46,6 +49,29 @@ void eval() {
         else if (op == ADJ)  {sp = sp + *pc++;}                                // add esp, <size>
         else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restore call frame and PC
         else if (op == LEA)  {ax = (int)(bp + *pc++);}                         // load address for arguments.
+
+        else if (op == OR)  ax = *sp++ | ax;
+        else if (op == XOR) ax = *sp++ ^ ax;
+        else if (op == AND) ax = *sp++ & ax;
+        else if (op == EQ)  ax = *sp++ == ax;
+        else if (op == NE)  ax = *sp++ != ax;
+        else if (op == LT)  ax = *sp++ < ax;
+        else if (op == LE)  ax = *sp++ <= ax;
+        else if (op == GT)  ax = *sp++ >  ax;
+        else if (op == GE)  ax = *sp++ >= ax;
+        else if (op == SHL) ax = *sp++ << ax;
+        else if (op == SHR) ax = *sp++ >> ax;
+        else if (op == ADD) ax = *sp++ + ax;
+        else if (op == SUB) ax = *sp++ - ax;
+        else if (op == MUL) ax = *sp++ * ax;
+        else if (op == DIV) ax = *sp++ / ax;
+        else if (op == MOD) ax = *sp++ % ax;
+
+        else if (op == EXIT) { printf("exit(%d)", *sp); return *sp;}
+        else {
+            printf("unknown instruction:%d\n", op);
+            return -1;
+        }
     }
 }
 
@@ -70,13 +96,25 @@ int main(int argc, char *argv[])
     memset(data, 0, poolsize);
     memset(stack, 0, poolsize);
 
+    sp = bp = stack;
+
+    int i = 0;
+    data[i++] = IMM;
+    data[i++] = 10;
+    data[i++] = PUSH;
+    data[i++] = IMM;
+    data[i++] = 20;
+    data[i++] = ADD;
+    data[i++] = PUSH;
+    data[i++] = EXIT;
+
+    pc = data;
+
     next();
 
     while (token) {
         statement();
     }
 
-    eval();
-
-    return 0;
+    return eval();
 }
