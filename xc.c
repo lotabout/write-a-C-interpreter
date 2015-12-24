@@ -288,7 +288,108 @@ void expression(int level) {
 }
 
 void statement() {
-    // int [*]id [; | (...) {...}]
+    // there are 8 kinds of statements here:
+    // 1. if (...) <statement> [else <statement>]
+    // 2. while (...) <statement>
+    // 3. { <statement> }
+    // 4. return xxx;
+    // 5. <empty statement>;
+    // 6. expression; (expression end with semicolon)
+
+    int *a, *b; // bess for branch control
+
+    if (token == If) {
+        // if (...) <statement> [else <statement>]
+        // 
+        //   if (...)           <cond>
+        //                      JZ a
+        //     <statement>      <statement>
+        //   else:              JMP b
+        // a:                   
+        //     <statement>      <statement>
+        // b:                   b:
+        //
+        //
+        match(If);
+        match('(');
+        expression(Assign);  // parse condition
+        match(')');
+
+        // emit code for if
+        *++text = JZ;
+        b = ++text;
+
+        statement();         // parse statement
+        if (token == Else) { // parse else
+            match(Else);
+
+            // emit code for JMP B
+            *b = (int)(text + 3);
+            *++text = JMP;
+            b = ++text;
+
+            statement();
+        }
+
+        *b = (int)(text + 1);
+    }
+    else if (token == While) {
+        //                         
+        // a:                     a:
+        //    while (<cond>)        <cond>
+        //                          JZ b
+        //     <statement>          <statement>
+        //                          JMP a
+        // b:                     b:
+        match(While);
+
+        a = text + 1;
+
+        match('(');
+        expression(Assign);
+        match(')');
+
+        *++text = JZ;
+        b = ++text;
+
+        statement();
+
+        *++text = JMP;
+        *++text = (int)*a;
+        *b = (int)(text + 1);
+    }
+    else if (token == '{') {
+        // { <statement> ... }
+        match('{');
+
+        while (token != '}') {
+            statement();
+        }
+
+        match('}');
+    }
+    else if (token == Return) {
+        // return [expression];
+        match(Return);
+
+        if (token != ';') {
+            expression(Assign);
+        }
+
+        match(';');
+
+        // emit code for return
+        *++text = LEV;
+    }
+    else if (token == ';') {
+        // empty statement
+        match(';');
+    }
+    else {
+        // a = b; or function_call();
+        expression(Assign);
+        match(';');
+    }
 }
 
 void enum_declaration() {
@@ -528,11 +629,6 @@ void program() {
     while (token) {
         global_declaration();
     }
-}
-
-
-void parse_function() {
-
 }
 
 int eval() {
