@@ -31,6 +31,7 @@ enum {Global, Local};
 int *text, // text segment
     *stack;// stack
 char *data; // data segment
+int * orig_text; // for dump text segment
 
 char *src;  // pointer to source code string;
 
@@ -1217,6 +1218,22 @@ int eval() {
     }
 }
 
+void dump_text() {
+    int * tmp;
+    tmp = orig_text;
+    while (tmp <= text) {
+        printf("%d", *tmp);
+        if (*tmp <= MOD) {
+            printf("%.4s",
+                & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
+                  "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[*tmp * 5]);
+        }
+        printf("\n");
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
     int i, fd;
@@ -1254,6 +1271,8 @@ int main(int argc, char *argv[])
     memset(data, 0, poolsize);
     memset(stack, 0, poolsize);
     memset(symbols, 0, poolsize);
+
+    orig_text = text;
 
     src = "char else enum if int return sizeof while "
           "open read close printf malloc memset memcmp exit void main";
@@ -1298,6 +1317,8 @@ int main(int argc, char *argv[])
         printf("main() not defined\n");
         return -1;
     }
+
+    //dump_text();
 
     // setup stack
     sp = (int *)((int)sp + poolsize);
