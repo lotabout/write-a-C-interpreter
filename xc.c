@@ -143,9 +143,11 @@ void next() {
             // character is '\n', store the string literal into data.
             last_pos = data;
             while (*src != 0 && *src != token) {
-                if ((token_val = *src++) && (token_val == '\\')) {
+                token_val = *src++;
+                if (token_val == '\\') {
                     // escape character
-                    if ((token_val = *src++) && (token_val == 'n')) {
+                    token_val = *src++;
+                    if (token_val == 'n') {
                         token_val = '\n';
                     }
                 }
@@ -155,12 +157,15 @@ void next() {
                 }
             }
 
+            src++;
             // if it is a single character, return Num token
-            if (token == '\"') {
+            if (token == '"') {
                 token_val = (int)last_pos;
             } else {
                 token = Num;
             }
+
+            return;
         }
         else if (token == '=') {
             // parse '==' and '='
@@ -302,12 +307,10 @@ void expression(int level) {
     int tmp;
     int *addr;
     {
-
         if (!token) {
             printf("%d: unexpected token EOF of expression\n", line);
             exit(-1);
         }
-
         if (token == Num) {
             match(Num);
 
@@ -327,7 +330,7 @@ void expression(int level) {
             expr_type = PTR;
 
             // store the rest strings
-            while (token = '"') {
+            while (token == '"') {
                 match('"');
             }
 
@@ -387,6 +390,7 @@ void expression(int level) {
                     if (token == ',') {
                         match(',');
                     }
+
                 }
                 match(')');
 
@@ -1064,6 +1068,7 @@ void function_declaration() {
     match('{');
     function_body();
     match('}');
+    token = ';';
 
     // unwind local variable declarations for all local variables.
     current_id = symbols;
@@ -1155,7 +1160,7 @@ void global_declaration() {
 }
 
 void program() {
-    while (token) {
+    while (token > 0) {
         global_declaration();
     }
 }
@@ -1220,8 +1225,8 @@ int main(int argc, char *argv[])
 
     // parse arguments
     if ((fd = open(argv[1], 0)) < 0) {
-        printf("could not open(%s)\n", *argv); 
-        return -1; 
+        printf("could not open(%s)\n", *argv);
+        return -1;
     }
 
     poolsize = 256 * 1024; // arbitrary size
@@ -1252,8 +1257,22 @@ int main(int argc, char *argv[])
 
     src = "char else enum if int return sizeof while "
           "open read close printf malloc memset memcmp exit void main";
-    i = Char; while (i <= While) { next(); current_id[Token] = i++; } // add keywords to symbol table
-    i = OPEN; while (i <= EXIT) { next(); current_id[Class] = Sys; current_id[Type] = INT; current_id[Value] = i++; } // add library to symbol table
+
+     // add keywords to symbol table
+    i = Char;
+    while (i <= While) {
+        next();
+        current_id[Token] = i++;
+    }
+
+    // add library to symbol table
+    i = OPEN;
+    while (i <= EXIT) {
+        next();
+        current_id[Class] = Sys;
+        current_id[Type] = INT;
+        current_id[Value] = i++;
+    }
 
     next(); current_id[Token] = Char; // handle void type
     next(); idmain = current_id; // keep track of main
@@ -1264,8 +1283,8 @@ int main(int argc, char *argv[])
     }
     // read the source file
     if ((i = read(fd, src, poolsize-1)) <= 0) {
-        printf("read() returned %d\n", i); 
-        return -1; 
+        printf("read() returned %d\n", i);
+        return -1;
     }
     src[i] = 0; // add EOF character
     close(fd);
@@ -1274,10 +1293,10 @@ int main(int argc, char *argv[])
     next();
 
     program();
-    
-    if (!(pc = (int *)idmain[Value])) { 
-        printf("main() not defined\n"); 
-        return -1; 
+
+    if (!(pc = (int *)idmain[Value])) {
+        printf("main() not defined\n");
+        return -1;
     }
 
     // setup stack
@@ -1285,7 +1304,7 @@ int main(int argc, char *argv[])
     *--sp = EXIT; // call exit if main returns
     *--sp = PUSH; tmp = sp;
     *--sp = argc;
-    *--sp = (int)argv;
+    *--sp = (int)argv[2];
     *--sp = (int)tmp;
 
     return eval();
