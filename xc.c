@@ -8,7 +8,7 @@ int token; // current token
 // instructions
 enum {IMM, LC, LI, SC, SI, PUSH, JMP, JZ, JNZ, CALL, RET, ENT, ADJ, LEV, LEA,
       OR, XOR, AND, EQ, NE, LT, LE, GT, GE, SHL, SHR, ADD, SUB, MUL, DIV, MOD,
-      EXIT};
+      OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT };
 
 // tokens and classes (operators last and in precedence order)
 // copied from c4
@@ -138,7 +138,7 @@ void next() {
                 return;
             }
         }
-        else if (token == '\"' || token == '\'') {
+        else if (token == '"' || token == '\'') {
             // parse string literal, currently, the only supported escape
             // character is '\n', store the string literal into data.
             last_pos = data;
@@ -150,7 +150,7 @@ void next() {
                     }
                 }
 
-                if (token == '\"') {
+                if (token == '"') {
                     *data++ = token_val;
                 }
             }
@@ -276,10 +276,10 @@ void next() {
 void match(int tk) {
     if (token == tk) {
         next();
+    } else {
+        printf("%d: expected token: %d\n", line, tk);
+        exit(-1);
     }
-
-    printf("expected token: %d\n", tk);
-    exit(-1);
 }
 
 
@@ -1109,8 +1109,8 @@ void global_declaration() {
     if (token == Int) {
         match(Int);
     }
-    else if (token == CHAR) {
-        match(CHAR);
+    else if (token == Char) {
+        match(Char);
         basetype = CHAR;
     }
 
@@ -1161,7 +1161,7 @@ void program() {
 }
 
 int eval() {
-    int op;
+    int op, *tmp;
     while (1) {
         op = *pc++; // get next operation code
         if (op == IMM)       {ax = *pc++;}                                     // load immediate value to ax
@@ -1198,6 +1198,13 @@ int eval() {
         else if (op == MOD) ax = *sp++ % ax;
 
         else if (op == EXIT) { printf("exit(%d)", *sp); return *sp;}
+        else if (op == OPEN) { ax = open((char *)sp[1], sp[0]); }
+        else if (op == CLOS) { ax = close(*sp);}
+        else if (op == READ) { ax = read(sp[2], (char *)sp[1], *sp); }
+        else if (op == PRTF) { tmp = sp + pc[1]; ax = printf((char *)tmp[-1], tmp[-2], tmp[-3], tmp[-4], tmp[-5], tmp[-6]); }
+        else if (op == MALC) { ax = (int)malloc(*sp);}
+        else if (op == MSET) { ax = (int)memset((char *)sp[2], sp[1], *sp);}
+        else if (op == MCMP) { ax = memcmp((char *)sp[2], (char *)sp[1], *sp);}
         else {
             printf("unknown instruction:%d\n", op);
             return -1;
@@ -1207,8 +1214,17 @@ int eval() {
 
 int main(int argc, char *argv[])
 {
-    poolsize = 256 * 1024; // arbitrary size
+    int i, fd;
+    int *idmain;
+    int *tmp;
 
+    // parse arguments
+    if ((fd = open(argv[1], 0)) < 0) {
+        printf("could not open(%s)\n", *argv); 
+        return -1; 
+    }
+
+    poolsize = 256 * 1024; // arbitrary size
     line = 1;
 
     // allocate memory
@@ -1224,29 +1240,53 @@ int main(int argc, char *argv[])
         printf("could not malloc(%d) for stack area\n", poolsize);
         return -1;
     }
+    if (!(symbols = malloc(poolsize))) {
+        printf("could not malloc(%d) for symbol table\n", poolsize);
+        return -1;
+    }
+
     memset(text, 0, poolsize);
     memset(data, 0, poolsize);
     memset(stack, 0, poolsize);
+    memset(symbols, 0, poolsize);
 
-    sp = bp = stack;
+    src = "char else enum if int return sizeof while "
+          "open read close printf malloc memset memcmp exit void main";
+    i = Char; while (i <= While) { next(); current_id[Token] = i++; } // add keywords to symbol table
+    i = OPEN; while (i <= EXIT) { next(); current_id[Class] = Sys; current_id[Type] = INT; current_id[Value] = i++; } // add library to symbol table
 
-    int i = 0;
-    data[i++] = IMM;
-    data[i++] = 10;
-    data[i++] = PUSH;
-    data[i++] = IMM;
-    data[i++] = 20;
-    data[i++] = ADD;
-    data[i++] = PUSH;
-    data[i++] = EXIT;
+    next(); current_id[Token] = Char; // handle void type
+    next(); idmain = current_id; // keep track of main
 
-    pc = data;
+    if (!(src = malloc(poolsize))) {
+        printf("could not malloc(%d) for source area\n", poolsize);
+        return -1;
+    }
+    // read the source file
+    if ((i = read(fd, src, poolsize-1)) <= 0) {
+        printf("read() returned %d\n", i); 
+        return -1; 
+    }
+    src[i] = 0; // add EOF character
+    close(fd);
+
 
     next();
 
-    while (token) {
-        statement();
+    program();
+    
+    if (!(pc = (int *)idmain[Value])) { 
+        printf("main() not defined\n"); 
+        return -1; 
     }
+
+    // setup stack
+    sp = (int *)((int)sp + poolsize);
+    *--sp = EXIT; // call exit if main returns
+    *--sp = PUSH; tmp = sp;
+    *--sp = argc;
+    *--sp = (int)argv;
+    *--sp = (int)tmp;
 
     return eval();
 }
