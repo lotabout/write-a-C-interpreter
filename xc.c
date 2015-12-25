@@ -32,6 +32,7 @@ int *text, // text segment
     *stack;// stack
 char *data; // data segment
 int * orig_text; // for dump text segment
+int *idmain;
 
 char *src;  // pointer to source code string;
 
@@ -559,7 +560,7 @@ void expression(int level) {
             }
             *++text = PUSH;
             *++text = IMM;
-            *++text = (expr_type > PTR) ? sizeof(int) : sizeof(char);
+            *++text = (expr_type >= PTR) ? sizeof(int) : sizeof(char);
             *++text = (token == Inc) ? ADD : SUB;
             *++text = (expr_type == CHAR) ? SC : SI;
         }
@@ -707,7 +708,7 @@ void expression(int level) {
                 expression(Mul);
 
                 expr_type = tmp;
-                if (expr_type > PTR) {
+                if (expr_type >= PTR) {
                     // pointer type
                     *++text = PUSH;
                     *++text = IMM;
@@ -721,7 +722,7 @@ void expression(int level) {
                 match(Sub);
                 *++text = PUSH;
                 expression(Mul);
-                if (tmp > PTR && tmp == expr_type) {
+                if (tmp >= PTR && tmp == expr_type) {
                     // pointer subtraction
                     *++text = SUB;
                     *++text = PUSH;
@@ -729,7 +730,7 @@ void expression(int level) {
                     *++text = sizeof(int);
                     *++text = DIV;
                     expr_type = INT;
-                } else if (tmp > PTR) {
+                } else if (tmp >= PTR) {
                     // pointer movement
                     *++text = PUSH;
                     *++text = IMM;
@@ -768,14 +769,13 @@ void expression(int level) {
                 // postfix inc(++) and dec(--)
                 // we will increase the value to the variable and decrease it
                 // on `ax` to get its original value.
-                match(token);
                 if (*text == LI) {
                     *text = PUSH;
-                    *text = LI;
+                    *++text = LI;
                 }
                 else if (*text == LC) {
                     *text = PUSH;
-                    *text = LC;
+                    *++text = LC;
                 }
                 else {
                     printf("%d: bad value in increment\n", line);
@@ -784,13 +784,14 @@ void expression(int level) {
 
                 *++text = PUSH;
                 *++text = IMM;
-                *++text = (expr_type > PTR) ? sizeof(int) : sizeof(char);
+                *++text = (expr_type >= PTR) ? sizeof(int) : sizeof(char);
                 *++text = (token == Inc) ? ADD : SUB;
                 *++text = (expr_type == CHAR) ? SC : SI;
                 *++text = PUSH;
                 *++text = IMM;
-                *++text = (expr_type > PTR) ? sizeof(int) : sizeof(char);
+                *++text = (expr_type >= PTR) ? sizeof(int) : sizeof(char);
                 *++text = (token == Inc) ? SUB : ADD;
+                match(token);
             }
             else if (token == Brak) {
                 // array access var[xx]
@@ -1169,8 +1170,18 @@ void program() {
 
 int eval() {
     int op, *tmp;
+    cycle = 0;
     while (1) {
+        cycle ++;
         op = *pc++; // get next operation code
+
+        // print debug info
+        //printf("%d> %.4s", cycle,
+        //       & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
+        //       "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+        //       "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
+        printf("%d\n", cycle);
+
         if (op == IMM)       {ax = *pc++;}                                     // load immediate value to ax
         else if (op == LC)   {ax = *(char *)ax;}                               // load character to ax, address in ax
         else if (op == LI)   {ax = *(int *)ax;}                                // load integer to ax, address in ax
@@ -1178,8 +1189,8 @@ int eval() {
         else if (op == SI)   {*(int *)*sp++ = ax;}                             // save integer to address, value in ax, address on stack
         else if (op == PUSH) {*--sp = ax;}                                     // push the value of ax onto the stack
         else if (op == JMP)  {pc = (int *)*pc;}                                // jump to the address
-        else if (op == JZ)   {pc = ax ? pc + 1 : (int *)pc;}                   // jump if ax is zero
-        else if (op == JNZ)  {pc = ax ? (int *)pc : pc + 1;}                   // jump if ax is zero
+        else if (op == JZ)   {pc = ax ? pc + 1 : (int *)*pc;}                   // jump if ax is zero
+        else if (op == JNZ)  {pc = ax ? (int *)*pc : pc + 1;}                   // jump if ax is zero
         else if (op == CALL) {*--sp = (int)(pc+1); pc = (int *)*pc;}           // call subroutine
         else if (op == RET)  {pc = (int *)*sp++;}                              // return from subroutine;
         else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
@@ -1222,15 +1233,17 @@ int eval() {
 void dump_text() {
     int * tmp;
     tmp = orig_text;
+    printf("id main is the %d seq\n", ((int *)idmain[Value] - tmp));
     while (tmp <= text) {
-        printf("%d", *tmp);
-        if (*tmp <= MOD) {
+        printf("%d ", *tmp);
+        if (*tmp >= IMM && *tmp <= EXIT) {
             printf("%.4s",
                 & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
                   "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
       "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[(*tmp) * 5]);
         }
         printf("\n");
+        tmp++;
     }
 
 }
@@ -1238,11 +1251,13 @@ void dump_text() {
 int main(int argc, char **argv)
 {
     int i, fd;
-    int *idmain;
     int *tmp;
 
+    argc--;
+    argv++;
+
     // parse arguments
-    if ((fd = open(argv[1], 0)) < 0) {
+    if ((fd = open(*argv, 0)) < 0) {
         printf("could not open(%s)\n", *argv);
         return -1;
     }
@@ -1319,14 +1334,14 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    //dump_text();
+    dump_text();
 
     // setup stack
     sp = (int *)((int)stack + poolsize);
     *--sp = EXIT; // call exit if main returns
     *--sp = PUSH; tmp = sp;
     *--sp = argc;
-    *--sp = (int)argv[2];
+    *--sp = (int)argv;
     *--sp = (int)tmp;
 
     return eval();
