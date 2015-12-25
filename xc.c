@@ -35,7 +35,6 @@ int * orig_text; // for dump text segment
 
 char *src;  // pointer to source code string;
 
-
 int poolsize; // default size of text/data/stack
 int *pc, *bp, *sp, ax, cycle; // virtual machine registers
 
@@ -91,7 +90,7 @@ void next() {
                     token = current_id[Token];
                     return;
                 }
-                current_id += IdSize;
+                current_id = current_id + IdSize;
             }
 
             // store new ID
@@ -471,7 +470,7 @@ void expression(int level) {
             match(Mul);
             expression(Inc); // dereference has the same precedence as Inc(++)
 
-            if (expr_type > PTR) {
+            if (expr_type >= PTR) {
                 expr_type = expr_type - PTR;
             } else {
                 printf("%d: bad dereference\n", line);
@@ -602,7 +601,7 @@ void expression(int level) {
                 }
                 *addr = (int)(text + 3);
                 *++text = JMP;
-                addr = *++text;
+                addr = ++text;
                 expression(Cond);
                 *addr = (int)(text + 1);
             }
@@ -800,7 +799,7 @@ void expression(int level) {
                 expression(Assign);
                 match(']');
 
-                if (tmp <= PTR) {
+                if (tmp < PTR) {
                     printf("%d: pointer type expected\n", line);
                     exit(-1);
                 }
@@ -1042,6 +1041,9 @@ void function_body() {
             current_id[BType]  = current_id[Type];  current_id[Type]   = type;
             current_id[BValue] = current_id[Value]; current_id[Value]  = ++pos_local;   // index of current parameter
 
+            if (token == ',') {
+                match(',');
+            }
         }
         match(';');
     }
@@ -1068,8 +1070,7 @@ void function_declaration() {
     match(')');
     match('{');
     function_body();
-    match('}');
-    token = ';';
+    //match('}');
 
     // unwind local variable declarations for all local variables.
     current_id = symbols;
@@ -1089,8 +1090,6 @@ void global_declaration() {
     int type; // tmp, actual type for variable
     int i; // tmp
 
-    // get next token
-    next();
     basetype = INT;
 
     // parse enum, this should be treated alone.
@@ -1121,7 +1120,7 @@ void global_declaration() {
     }
 
     // parse the comma seperated variable declaration.
-    while (token != ';') {
+    while (token != ';' && token != '}') {
         type = basetype;
         // parse pointer type, note that there may exist `int ****x;`
         while (token == Mul) {
@@ -1144,7 +1143,7 @@ void global_declaration() {
 
         if (token == '(') {
             current_id[Class] = Fun;
-            current_id[Value] = (int)(data + 1); // the memory address of function
+            current_id[Value] = (int)(text + 1); // the memory address of function
             function_declaration();
         } else {
             // variable declaration
@@ -1157,10 +1156,12 @@ void global_declaration() {
             match(',');
         }
     }
-    match(';');
+    next();
 }
 
 void program() {
+    // get next token
+    next();
     while (token > 0) {
         global_declaration();
     }
@@ -1227,14 +1228,14 @@ void dump_text() {
             printf("%.4s",
                 & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
                   "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[*tmp * 5]);
+      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[(*tmp) * 5]);
         }
         printf("\n");
     }
 
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     int i, fd;
     int *idmain;
@@ -1321,7 +1322,7 @@ int main(int argc, char *argv[])
     //dump_text();
 
     // setup stack
-    sp = (int *)((int)sp + poolsize);
+    sp = (int *)((int)stack + poolsize);
     *--sp = EXIT; // call exit if main returns
     *--sp = PUSH; tmp = sp;
     *--sp = argc;
