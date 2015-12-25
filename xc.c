@@ -344,7 +344,7 @@ void expression(int level) {
 
             // append the end of string character '\0', all the data are default
             // to 0, so just move data one position forward.
-            data = (char *)(((int)data + sizeof (int)) & (-sizeof(int)));
+            data = (char *)(((int)data + sizeof(int)) & (-sizeof(int)));
             expr_type = PTR;
         }
         else if (token == Sizeof) {
@@ -456,8 +456,8 @@ void expression(int level) {
             // cast or parenthesis
             match('(');
             if (token == Int || token == Char) {
-                match(token);
                 tmp = (token == Char) ? CHAR : INT; // cast type
+                match(token);
                 while (token == Mul) {
                     match(Mul);
                     tmp = tmp + PTR;
@@ -654,7 +654,7 @@ void expression(int level) {
                 match(And);
                 *++text = PUSH;
                 expression(Eq);
-                *++text = And;
+                *++text = AND;
                 expr_type = INT;
             }
             else if (token == Eq) {
@@ -1200,11 +1200,11 @@ int eval() {
         op = *pc++; // get next operation code
 
         // print debug info
-        printf("%d> %.4s", cycle,
-              & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
-              "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-              "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
-        printf("\n");
+        //printf("%d> %.4s", cycle,
+        //      & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
+        //      "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+        //      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
+        //printf("\n");
 
         if (op == IMM)       {ax = *pc++;}                                     // load immediate value to ax
         else if (op == LC)   {ax = *(char *)ax;}                               // load character to ax, address in ax
@@ -1279,6 +1279,7 @@ int main(int argc, char **argv)
 
     argc--;
     argv++;
+
 
     // parse arguments
     if ((fd = open(*argv, 0)) < 0) {
