@@ -627,6 +627,7 @@ void expression(int level) {
             else if (token == Or) {
                 // bitwise or
                 match(Or);
+                *++text = PUSH;
                 expression(Xor);
                 *++text = OR;
                 expr_type = INT;
@@ -634,6 +635,7 @@ void expression(int level) {
             else if (token == Xor) {
                 // bitwise xor
                 match(Xor);
+                *++text = PUSH;
                 expression(And);
                 *++text = XOR;
                 expr_type = INT;
@@ -641,6 +643,7 @@ void expression(int level) {
             else if (token == And) {
                 // bitwise and
                 match(And);
+                *++text = PUSH;
                 expression(Eq);
                 *++text = And;
                 expr_type = INT;
@@ -648,6 +651,7 @@ void expression(int level) {
             else if (token == Eq) {
                 // equal ==
                 match(Eq);
+                *++text = PUSH;
                 expression(Ne);
                 *++text = EQ;
                 expr_type = INT;
@@ -655,6 +659,7 @@ void expression(int level) {
             else if (token == Ne) {
                 // not equal !=
                 match(Ne);
+                *++text = PUSH;
                 expression(Lt);
                 *++text = NE;
                 expr_type = INT;
@@ -662,6 +667,7 @@ void expression(int level) {
             else if (token == Lt) {
                 // less than
                 match(Lt);
+                *++text = PUSH;
                 expression(Shl);
                 *++text = LT;
                 expr_type = INT;
@@ -669,6 +675,7 @@ void expression(int level) {
             else if (token == Gt) {
                 // greater than
                 match(Gt);
+                *++text = PUSH;
                 expression(Shl);
                 *++text = GT;
                 expr_type = INT;
@@ -676,6 +683,7 @@ void expression(int level) {
             else if (token == Le) {
                 // less than or equal to
                 match(Le);
+                *++text = PUSH;
                 expression(Shl);
                 *++text = LE;
                 expr_type = INT;
@@ -683,6 +691,7 @@ void expression(int level) {
             else if (token == Ge) {
                 // greater than or equal to
                 match(Ge);
+                *++text = PUSH;
                 expression(Shl);
                 *++text = GE;
                 expr_type = INT;
@@ -690,6 +699,7 @@ void expression(int level) {
             else if (token == Shl) {
                 // shift left
                 match(Shl);
+                *++text = PUSH;
                 expression(Add);
                 *++text = SHL;
                 expr_type = INT;
@@ -697,6 +707,7 @@ void expression(int level) {
             else if (token == Shr) {
                 // shift right
                 match(Shr);
+                *++text = PUSH;
                 expression(Add);
                 *++text = SHR;
                 expr_type = INT;
@@ -747,6 +758,7 @@ void expression(int level) {
             else if (token == Mul) {
                 // multiply
                 match(Mul);
+                *++text = PUSH;
                 expression(Inc);
                 *++text = MUL;
                 expr_type = tmp;
@@ -754,6 +766,7 @@ void expression(int level) {
             else if (token == Div) {
                 // divide
                 match(Div);
+                *++text = PUSH;
                 expression(Inc);
                 *++text = DIV;
                 expr_type = tmp;
@@ -761,6 +774,7 @@ void expression(int level) {
             else if (token == Mod) {
                 // Modulo
                 match(Mod);
+                *++text = PUSH;
                 expression(Inc);
                 *++text = MOD;
                 expr_type = tmp;
@@ -889,7 +903,7 @@ void statement() {
         statement();
 
         *++text = JMP;
-        *++text = (int)*a;
+        *++text = (int)a;
         *b = (int)(text + 1);
     }
     else if (token == '{') {
@@ -1177,10 +1191,10 @@ int eval() {
 
         // print debug info
         //printf("%d> %.4s", cycle,
-        //       & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
-        //       "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-        //       "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
-        printf("%d\n", cycle);
+        //      & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
+        //      "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+        //      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
+        //printf("\n");
 
         if (op == IMM)       {ax = *pc++;}                                     // load immediate value to ax
         else if (op == LC)   {ax = *(char *)ax;}                               // load character to ax, address in ax
@@ -1334,7 +1348,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    dump_text();
+    //dump_text();
 
     // setup stack
     sp = (int *)((int)stack + poolsize);
