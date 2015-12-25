@@ -61,6 +61,7 @@ int index_of_bp; // index of bp pointer on stack
 void next() {
     char *last_pos;
     int hash;
+
     while (token = *src) {
         ++src;
 
@@ -74,6 +75,10 @@ void next() {
             }
         }
         else if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') || (token == '_')) {
+        //printf("====================================\n");
+        //printf("token = %c\n", token);
+        //printf("src: %s\n", src);
+
             // parse identifier
             last_pos = src - 1;
             hash = token;
@@ -82,6 +87,8 @@ void next() {
                 hash = hash * 147 + *src;
                 src++;
             }
+
+            //printf("id = '%s'\n", last_pos);
 
             // look for existing identifier, linear search
             current_id = symbols;
@@ -93,6 +100,7 @@ void next() {
                 }
                 current_id = current_id + IdSize;
             }
+
 
             // store new ID
             current_id[Name] = (int)last_pos;
@@ -323,13 +331,12 @@ void expression(int level) {
         else if (token == '"') {
             // continous string "abc" "abc"
 
-            match('"');
 
             // emit code
             *++text = IMM;
             *++text = token_val;
-            expr_type = PTR;
 
+            match('"');
             // store the rest strings
             while (token == '"') {
                 match('"');
@@ -338,6 +345,7 @@ void expression(int level) {
             // append the end of string character '\0', all the data are default
             // to 0, so just move data one position forward.
             data = (char *)(((int)data + sizeof (int)) & (-sizeof(int)));
+            expr_type = PTR;
         }
         else if (token == Sizeof) {
             // sizeof is actually an unary operator
@@ -546,6 +554,7 @@ void expression(int level) {
             expr_type = INT;
         }
         else if (token == Inc || token == Dec) {
+            tmp = token;
             match(token);
             expression(Inc);
             if (*text == LC) {
@@ -560,8 +569,8 @@ void expression(int level) {
             }
             *++text = PUSH;
             *++text = IMM;
-            *++text = (expr_type >= PTR) ? sizeof(int) : sizeof(char);
-            *++text = (token == Inc) ? ADD : SUB;
+            *++text = (expr_type > PTR) ? sizeof(int) : sizeof(char);
+            *++text = (tmp == Inc) ? ADD : SUB;
             *++text = (expr_type == CHAR) ? SC : SI;
         }
         else {
@@ -719,8 +728,8 @@ void expression(int level) {
                 expression(Mul);
 
                 expr_type = tmp;
-                if (expr_type >= PTR) {
-                    // pointer type
+                if (expr_type > PTR) {
+                    // pointer type, and not `char *`
                     *++text = PUSH;
                     *++text = IMM;
                     *++text = sizeof(int);
@@ -733,7 +742,7 @@ void expression(int level) {
                 match(Sub);
                 *++text = PUSH;
                 expression(Mul);
-                if (tmp >= PTR && tmp == expr_type) {
+                if (tmp > PTR && tmp == expr_type) {
                     // pointer subtraction
                     *++text = SUB;
                     *++text = PUSH;
@@ -741,7 +750,7 @@ void expression(int level) {
                     *++text = sizeof(int);
                     *++text = DIV;
                     expr_type = INT;
-                } else if (tmp >= PTR) {
+                } else if (tmp > PTR) {
                     // pointer movement
                     *++text = PUSH;
                     *++text = IMM;
@@ -798,12 +807,12 @@ void expression(int level) {
 
                 *++text = PUSH;
                 *++text = IMM;
-                *++text = (expr_type >= PTR) ? sizeof(int) : sizeof(char);
+                *++text = (expr_type > PTR) ? sizeof(int) : sizeof(char);
                 *++text = (token == Inc) ? ADD : SUB;
                 *++text = (expr_type == CHAR) ? SC : SI;
                 *++text = PUSH;
                 *++text = IMM;
-                *++text = (expr_type >= PTR) ? sizeof(int) : sizeof(char);
+                *++text = (expr_type > PTR) ? sizeof(int) : sizeof(char);
                 *++text = (token == Inc) ? SUB : ADD;
                 match(token);
             }
@@ -1102,6 +1111,7 @@ void function_declaration() {
 void global_declaration() {
     // int [*]id [; | (...) {...}]
 
+
     int type; // tmp, actual type for variable
     int i; // tmp
 
@@ -1190,11 +1200,11 @@ int eval() {
         op = *pc++; // get next operation code
 
         // print debug info
-        //printf("%d> %.4s", cycle,
-        //      & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
-        //      "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-        //      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
-        //printf("\n");
+        printf("%d> %.4s", cycle,
+              & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
+              "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+              "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
+        printf("\n");
 
         if (op == IMM)       {ax = *pc++;}                                     // load immediate value to ax
         else if (op == LC)   {ax = *(char *)ax;}                               // load character to ax, address in ax
@@ -1338,7 +1348,6 @@ int main(int argc, char **argv)
     src[i] = 0; // add EOF character
     close(fd);
 
-
     next();
 
     program();
@@ -1348,6 +1357,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>before run\n");
     //dump_text();
 
     // setup stack
@@ -1357,6 +1367,8 @@ int main(int argc, char **argv)
     *--sp = argc;
     *--sp = (int)argv;
     *--sp = (int)tmp;
+
+    //printf(">>>>>>>>>>>>>>>>>>>>\nargv:'%s'\n", *argv);
 
     return eval();
 }
