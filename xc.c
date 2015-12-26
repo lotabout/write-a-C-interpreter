@@ -1365,8 +1365,6 @@ int main(int argc, char **argv)
     src[i] = 0; // add EOF character
     close(fd);
 
-    next();
-
     program();
 
     if (!(pc = (int *)idmain[Value])) {
