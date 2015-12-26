@@ -595,6 +595,7 @@ void expression(int level) {
                 }
                 expression(Assign);
 
+                expr_type = tmp;
                 *++text = (expr_type == CHAR) ? SC : SI;
             }
             else if (token == Cond) {
