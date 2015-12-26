@@ -94,9 +94,6 @@ void next() {
             }
         }
         else if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') || (token == '_')) {
-        //printf("====================================\n");
-        //printf("token = %c\n", token);
-        //printf("src: %s\n", src);
 
             // parse identifier
             last_pos = src - 1;
@@ -106,8 +103,6 @@ void next() {
                 hash = hash * 147 + *src;
                 src++;
             }
-
-            //printf("id = '%s'\n", last_pos);
 
             // look for existing identifier, linear search
             current_id = symbols;
