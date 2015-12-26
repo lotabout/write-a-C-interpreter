@@ -3,12 +3,15 @@
 #include <memory.h>
 #include <string.h>
 
+int debug;    // print the executed instructions
+int assembly; // print out the assembly and source
+
 int token; // current token
 
 // instructions
-enum {IMM, LC, LI, SC, SI, PUSH, JMP, JZ, JNZ, CALL, RET, ENT, ADJ, LEV, LEA,
-      OR, XOR, AND, EQ, NE, LT, LE, GT, GE, SHL, SHR, ADD, SUB, MUL, DIV, MOD,
-      OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT };
+enum { LEA ,IMM ,JMP ,CALL,JZ  ,JNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PUSH,
+       OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,
+       OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT };
 
 // tokens and classes (operators last and in precedence order)
 // copied from c4
@@ -30,11 +33,11 @@ enum {Global, Local};
 
 int *text, // text segment
     *stack;// stack
+int * old_text; // for dump text segment
 char *data; // data segment
-int * orig_text; // for dump text segment
 int *idmain;
 
-char *src;  // pointer to source code string;
+char *src, *old_src;  // pointer to source code string;
 
 int poolsize; // default size of text/data/stack
 int *pc, *bp, *sp, ax, cycle; // virtual machine registers
@@ -66,6 +69,22 @@ void next() {
         ++src;
 
         if (token == '\n') {
+            if (assembly) {
+                // print compile info
+                printf("%d: %.*s", line, src-old_src, old_src);
+                old_src = src;
+
+                while (old_text < text) {
+                    printf("%8.4s", & "LEA ,IMM ,JMP ,CALL,JZ  ,JNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PUSH,"
+                                      "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+                                      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[*++old_text * 5]);
+
+                    if (*old_text <= ADJ)
+                        printf(" %d\n", *++old_text);
+                    else
+                        printf("\n");
+                }
+            }
             ++line;
         }
         else if (token == '#') {
@@ -824,16 +843,18 @@ void expression(int level) {
                 expression(Assign);
                 match(']');
 
-                if (tmp < PTR) {
+                if (tmp > PTR) {
+                    // pointer, `not char *`
+                    *++text = PUSH;
+                    *++text = IMM;
+                    *++text = sizeof(int);
+                    *++text = MUL;
+                }
+                else if (tmp < PTR) {
                     printf("%d: pointer type expected\n", line);
                     exit(-1);
                 }
-
                 expr_type = tmp - PTR;
-                *++text = PUSH;
-                *++text = IMM;
-                *++text = sizeof(int);
-                *++text = MUL;
                 *++text = ADD;
                 *++text = (expr_type == CHAR) ? LC : LI;
             }
@@ -1201,12 +1222,16 @@ int eval() {
         op = *pc++; // get next operation code
 
         // print debug info
-        //printf("%d> %.4s", cycle,
-        //      & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
-        //      "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-        //      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
-        //printf("\n");
-
+        if (debug) {
+            printf("%d> %.4s", cycle,
+                   & "LEA ,IMM ,JMP ,CALL,JZ  ,JNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PUSH,"
+                   "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+                   "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[op * 5]);
+            if (op <= ADJ)
+                printf(" %d\n", *pc);
+            else
+                printf("\n");
+        }
         if (op == IMM)       {ax = *pc++;}                                     // load immediate value to ax
         else if (op == LC)   {ax = *(char *)ax;}                               // load character to ax, address in ax
         else if (op == LI)   {ax = *(int *)ax;}                                // load integer to ax, address in ax
@@ -1217,7 +1242,7 @@ int eval() {
         else if (op == JZ)   {pc = ax ? pc + 1 : (int *)*pc;}                   // jump if ax is zero
         else if (op == JNZ)  {pc = ax ? (int *)*pc : pc + 1;}                   // jump if ax is zero
         else if (op == CALL) {*--sp = (int)(pc+1); pc = (int *)*pc;}           // call subroutine
-        else if (op == RET)  {pc = (int *)*sp++;}                              // return from subroutine;
+        //else if (op == RET)  {pc = (int *)*sp++;}                              // return from subroutine;
         else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
         else if (op == ADJ)  {sp = sp + *pc++;}                                // add esp, <size>
         else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restore call frame and PC
@@ -1255,24 +1280,6 @@ int eval() {
     }
 }
 
-void dump_text() {
-    int * tmp;
-    tmp = orig_text;
-    printf("id main is the %d seq\n", ((int *)idmain[Value] - tmp));
-    while (tmp <= text) {
-        printf("%d ", *tmp);
-        if (*tmp >= IMM && *tmp <= EXIT) {
-            printf("%.4s",
-                & "IMM ,LC  ,LI  ,SC  ,SI  ,PUSH,JMP ,JZ  ,JNZ ,CALL,RET ,ENT ,ADJ ,LEV ,LEA ,"
-                  "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,LE  ,GT  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-      "OPEN,READ,CLOS,PRTF,MALC,MSET,MCMP,EXIT"[(*tmp) * 5]);
-        }
-        printf("\n");
-        tmp++;
-    }
-
-}
-
 int main(int argc, char **argv)
 {
     int i, fd;
@@ -1281,8 +1288,21 @@ int main(int argc, char **argv)
     argc--;
     argv++;
 
-
     // parse arguments
+    if (argc > 0 && **argv == '-' && (*argv)[1] == 's') {
+        assembly = 1;
+        --argc;
+        ++argv;
+    }
+    if (argc > 0 && **argv == '-' && (*argv)[1] == 'd') {
+        debug = 1;
+        --argc;
+        ++argv;
+    }
+    if (argc < 1) {
+        printf("usage: xc [-s] [-d] file ...\n");
+    }
+
     if ((fd = open(*argv, 0)) < 0) {
         printf("could not open(%s)\n", *argv);
         return -1;
@@ -1314,7 +1334,7 @@ int main(int argc, char **argv)
     memset(stack, 0, poolsize);
     memset(symbols, 0, poolsize);
 
-    orig_text = text;
+    old_text = text;
 
     src = "char else enum if int return sizeof while "
           "open read close printf malloc memset memcmp exit void main";
@@ -1338,7 +1358,7 @@ int main(int argc, char **argv)
     next(); current_id[Token] = Char; // handle void type
     next(); idmain = current_id; // keep track of main
 
-    if (!(src = malloc(poolsize))) {
+    if (!(src = old_src = malloc(poolsize))) {
         printf("could not malloc(%d) for source area\n", poolsize);
         return -1;
     }
@@ -1359,8 +1379,11 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    //printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>before run\n");
-    //dump_text();
+    // dump_text();
+    if (assembly) {
+        // only for compile
+        return 0;
+    }
 
     // setup stack
     sp = (int *)((int)stack + poolsize);
@@ -1369,8 +1392,6 @@ int main(int argc, char **argv)
     *--sp = argc;
     *--sp = (int)argv;
     *--sp = (int)tmp;
-
-    //printf(">>>>>>>>>>>>>>>>>>>>\nargv:'%s'\n", *argv);
 
     return eval();
 }
