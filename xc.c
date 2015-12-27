@@ -1296,6 +1296,7 @@ int main(int argc, char **argv)
     }
     if (argc < 1) {
         printf("usage: xc [-s] [-d] file ...\n");
+        return -1;
     }
 
     if ((fd = open(*argv, 0)) < 0) {
