@@ -1,4 +1,9 @@
+C interpreter that interpretes itself.
+
 # How to Run the Code
+
+File `xc.c` is the original one and `xc-tutor.c` is the one that I make for
+the tutorial step by step.
 
 ```
 gcc -o xc xc.c (you may need the -m32 option on 64bit machines)
@@ -21,9 +26,18 @@ Despite the complexity we saw in books about compiler design, writing one is
 not that hard. You don't need that much theory though they will help for
 better understanding the logic behind the code.
 
-Also I write a [series of
-article](http://lotabout.github.io/2015/%E5%86%99%E4%B8%AA-C-%E7%BC%96%E8%AF%91%E5%99%A8-1/)
-about how this compiler is built(in Chinese though).
+Also I write a series of article about how this compiler is built(in Chinese though):
+
+- [手把手教你构建 C 语言编译器（0）](http://lotabout.me/2015/write-a-C-interpreter-0/)
+- [手把手教你构建 C 语言编译器（1）](http://lotabout.me/2015/write-a-C-interpreter-1/)
+- [手把手教你构建 C 语言编译器（2）](http://lotabout.me/2015/write-a-C-interpreter-2/)
+- [手把手教你构建 C 语言编译器（3）](http://lotabout.me/2015/write-a-C-interpreter-3/)
+- [手把手教你构建 C 语言编译器（4）](http://lotabout.me/2015/write-a-C-interpreter-4/)
+- [手把手教你构建 C 语言编译器（5）](http://lotabout.me/2015/write-a-C-interpreter-5/)
+- [手把手教你构建 C 语言编译器（6）](http://lotabout.me/2015/write-a-C-interpreter-6/)
+- [手把手教你构建 C 语言编译器（7）](http://lotabout.me/2015/write-a-C-interpreter-7/)
+- [手把手教你构建 C 语言编译器（8）](http://lotabout.me/2015/write-a-C-interpreter-8/)
+- [手把手教你构建 C 语言编译器（9）](http://lotabout.me/2015/write-a-C-interpreter-9/)
 
 # Licence
 
