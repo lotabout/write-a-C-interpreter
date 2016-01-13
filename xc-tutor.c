@@ -60,6 +60,11 @@ int main(int argc, char **argv)
         return -1;
     }
     src[i] = 0; // add EOF character
+    
+    while(0 != *src){
+        printf("%c",*src++);
+    }
+    
     close(fd);
 
     program();
