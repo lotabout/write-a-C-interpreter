@@ -28,16 +28,16 @@ better understanding the logic behind the code.
 
 Also I write a series of article about how this compiler is built(in Chinese though):
 
-- [手把手教你构建 C 语言编译器（0）](http://lotabout.me/2015/write-a-C-interpreter-0/)
-- [手把手教你构建 C 语言编译器（1）](http://lotabout.me/2015/write-a-C-interpreter-1/)
-- [手把手教你构建 C 语言编译器（2）](http://lotabout.me/2015/write-a-C-interpreter-2/)
-- [手把手教你构建 C 语言编译器（3）](http://lotabout.me/2015/write-a-C-interpreter-3/)
-- [手把手教你构建 C 语言编译器（4）](http://lotabout.me/2015/write-a-C-interpreter-4/)
-- [手把手教你构建 C 语言编译器（5）](http://lotabout.me/2015/write-a-C-interpreter-5/)
-- [手把手教你构建 C 语言编译器（6）](http://lotabout.me/2015/write-a-C-interpreter-6/)
-- [手把手教你构建 C 语言编译器（7）](http://lotabout.me/2015/write-a-C-interpreter-7/)
-- [手把手教你构建 C 语言编译器（8）](http://lotabout.me/2015/write-a-C-interpreter-8/)
-- [手把手教你构建 C 语言编译器（9）](http://lotabout.me/2015/write-a-C-interpreter-9/)
+1. [手把手教你构建 C 语言编译器（0）——前言](http://lotabout.me/2015/write-a-C-interpreter-0/)
+2. [手把手教你构建 C 语言编译器（1）——设计](http://lotabout.me/2015/write-a-C-interpreter-1/)
+3. [手把手教你构建 C 语言编译器（2）——虚拟机](http://lotabout.me/2015/write-a-C-interpreter-2/)
+4. [手把手教你构建 C 语言编译器（3）——词法分析器](http://lotabout.me/2015/write-a-C-interpreter-3/)
+4. [手把手教你构建 C 语言编译器（4）——递归下降](http://lotabout.me/2016/write-a-C-interpreter-4/)
+5. [手把手教你构建 C 语言编译器（5）——变量定义](http://lotabout.me/2016/write-a-C-interpreter-5/)
+6. [手把手教你构建 C 语言编译器（6）——函数定义](http://lotabout.me/2016/write-a-C-interpreter-6/)
+7. [手把手教你构建 C 语言编译器（7）——语句](http://lotabout.me/2016/write-a-C-interpreter-7/)
+8. [手把手教你构建 C 语言编译器（8）——表达式](http://lotabout.me/2016/write-a-C-interpreter-8/)
+0. [手把手教你构建 C 语言编译器（9）——总结](http://lotabout.me/2016/write-a-C-interpreter-9/)
 
 # Licence
 
