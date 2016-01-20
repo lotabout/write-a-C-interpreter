@@ -95,7 +95,7 @@ void next() {
                     //hex
                     token = *++src;
                     while ((token >= '0' && token <= '9') || (token >= 'a' && token <= 'f') || (token >= 'A' && token <= 'F')) {
-                        token_val = token_val * 16 + (token & 16) + (token >= 'A' ? 9 : 0);
+                        token_val = token_val * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
                         token = *++src;
                     }
                 } else {
