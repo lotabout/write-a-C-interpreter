@@ -1015,7 +1015,7 @@ void function_body() {
                 printf("%d: bad local declaration\n", line);
                 exit(-1);
             }
-            if (current_id[Class]) {
+            if (current_id[Class] == Loc) {
                 // identifier exists
                 printf("%d: duplicate local declaration\n", line);
                 exit(-1);
