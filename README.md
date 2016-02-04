@@ -39,6 +39,19 @@ Also I write a series of article about how this compiler is built(in Chinese tho
 8. [手把手教你构建 C 语言编译器（8）——表达式](http://lotabout.me/2016/write-a-C-interpreter-8/)
 0. [手把手教你构建 C 语言编译器（9）——总结](http://lotabout.me/2016/write-a-C-interpreter-9/)
 
+# Resources
+
+Further Reading:
+
+- [Let's Build a Compiler](http://compilers.iecc.com/crenshaw/): An excellent
+    starting material for building compiler.
+
+
+Forks:
+
+- [A fork that implement debugger for xc.c](https://github.com/descent/write-a-C-interpreter)
+
+
 # Licence
 
 The original code is licenced with GPL2, so this code will use the same
