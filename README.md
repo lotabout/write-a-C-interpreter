@@ -26,7 +26,9 @@ Despite the complexity we saw in books about compiler design, writing one is
 not that hard. You don't need that much theory though they will help for
 better understanding the logic behind the code.
 
-Also I write a series of article about how this compiler is built(in Chinese though):
+Also I write a series of article about how this compiler is built under directory `tutorial/en`.
+
+There is also a chinese version in my blog.
 
 1. [手把手教你构建 C 语言编译器（0）——前言](http://lotabout.me/2015/write-a-C-interpreter-0/)
 2. [手把手教你构建 C 语言编译器（1）——设计](http://lotabout.me/2015/write-a-C-interpreter-1/)
