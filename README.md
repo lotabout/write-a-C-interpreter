@@ -10,8 +10,8 @@ gcc -o xc xc.c (you may need the -m32 option on 64bit machines)
 ./xc hello.c
 ./xc -s hello.c
 
-./xc c4.c hello.c
-./xc c4.c c4.c hello.c
+./xc xc.c hello.c
+./xc xc.c xc.c hello.c
 ```
 
 # About
