@@ -1206,7 +1206,7 @@ int eval() {
         else if (op == PUSH) {*--sp = ax;}                                     // push the value of ax onto the stack
         else if (op == JMP)  {pc = (int *)*pc;}                                // jump to the address
         else if (op == JZ)   {pc = ax ? pc + 1 : (int *)*pc;}                   // jump if ax is zero
-        else if (op == JNZ)  {pc = ax ? (int *)*pc : pc + 1;}                   // jump if ax is zero
+        else if (op == JNZ)  {pc = ax ? (int *)*pc : pc + 1;}                   // jump if ax is not zero
         else if (op == CALL) {*--sp = (int)(pc+1); pc = (int *)*pc;}           // call subroutine
         //else if (op == RET)  {pc = (int *)*sp++;}                              // return from subroutine;
         else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
