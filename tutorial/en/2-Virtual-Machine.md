@@ -156,7 +156,7 @@ have any code generation yet, thus skip for now.
     memset(stack, 0, poolsize);
     ...
 
-    bp = sp = (int *)((int)stack + poolsize);
+    bp = sp = stack + poolsize/sizeof(int);
     ax = 0;
 
     ...
