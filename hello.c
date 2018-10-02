@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 int fibonacci(int i) {
     if (i <= 1) {
         return 1;
