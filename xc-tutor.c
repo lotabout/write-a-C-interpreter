@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     memset(text, 0, poolsize);
     memset(data, 0, poolsize);
     memset(stack, 0, poolsize);
-    bp = sp = (int *)((int)stack + poolsize);
+    bp = sp = (int *)((long)stack + poolsize);
     ax = 0;
 
 
