@@ -1,4 +1,4 @@
-C interpreter that interpretes itself.
+C interpreter that interprets itself.
 
 # How to Run the Code
 
@@ -19,7 +19,7 @@ gcc -o xc xc.c (you may need the -m32 option on 64bit machines)
 This project is inspired by [c4](https://github.com/rswier/c4) and is largely
 based on it.
 
-However, I rewrited them all to make it more understable and help myself to
+However, I rewrote them all to make it more understandable and help myself to
 understand it.
 
 Despite the complexity we saw in books about compiler design, writing one is
