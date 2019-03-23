@@ -1,8 +1,8 @@
-This series of articles is a tutorial of building a C compiler from scratch. 
+This series of articles is a tutorial for building a C compiler from scratch.
 
 I lied a little in the above sentence: it is actually an _interpreter_ instead
 of _compiler_. I lied because what the hell is a "C interpreter"? You will
-however, understand compiler better by building an interpreter.
+however, understand compilers better by building an interpreter.
 
 Yeah, I wish you can get a basic understanding of how a compiler is
 constructed, and realize it is not that hard to build one. Good Luck!
@@ -11,7 +11,7 @@ Finally, this series is written in Chinese in the first place, feel free to
 correct me if you are confused by my English. And I would like it very much if
 you could teach me some "native" English :)
 
-We won't write any code in this chapter, feel free to skip if you are
+We won't write any code in this chapter, feel free to skip it if you are
 desperate to see some code...
 
 ## Why you should care about compiler theory?
@@ -20,10 +20,10 @@ Because it is **COOL**!
 
 And it is very useful. Programs are built to do something for us, when they
 are used to translate some forms of data into another form, we can call them
-compiler. Thus by learning some compiler theory we are trying to master a very
+a compiler. Thus by learning some compiler theory we are trying to master a very
 powerful technique of solving problems. Isn't that cool enough to you?
 
-People used to say understanding how compiler works would help you to write
+People used to say understanding how a compiler works would help you to write
 better code. Some would argue that modern compilers are so good at
 optimization that you should not care any more. Well, that's true, most people
 don't need to learn compiler theory only to improve the efficency of the code.
@@ -34,7 +34,7 @@ And by most people, I mean you!
 I have always been in awe of compiler theory because that's what makes
 programing easy. Anyway can you imaging building a web browser in only
 assembly language? So when I got a chance to learn compiler theory in college,
-I was so exciting! And then... I quit, not understanding what that it.
+I was so excited! And then... I quit, not understanding what that it.
 
 Normally a course of compiler will cover:
 
@@ -46,21 +46,21 @@ Normally a course of compiler will cover:
 5. Code generation.
 6. Code optimization.
 
-Perhaps more than 90% students will not care anything beyond parser, and
-what's more, we still don't know how to build a compiler! Even after all these
-efforts learning the theories. Well the main reason is that what "Compiler
+Perhaps more than 90% students will not care anything beyond the parser, and
+what's more, we still don't know how to build a compiler! Even after all the
+effort learning the theories. Well the main reason is that what "Compiler
 Thoery" trys to teach is "How to build a parser generator", namely a tool that
 consumes syntax gramer and generates a compiler for you. lex/yacc or
 flex/bison or things like that.
 
-These theories try to taught us how to solve a general problems of generating
-compilers automatically. That means once you've master them, you are able to
+These theories try to teach us how to solve the general problems of generating
+compilers automatically. That means once you've mastered them, you are able to
 deal with all kinds of grammars. They are indeed useful in industry.
-Nevertheless they are too powerful and too complicate for students and most
+Nevertheless they are too powerful and too complicated for students and most
 programmers. You will understand that if you try to read lex/yacc's source
 code.
 
-Good news is building a compiler can be much simpler than you'd ever imagined.
+Good news is building a compiler can be much simpler than you ever imagined.
 I won't lie, not easy, but definitely not hard.
 
 ## Birth of this project
