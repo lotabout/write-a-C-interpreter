@@ -286,11 +286,11 @@ void next() {
 
 ## String Literals
 
-If we found any string literal, we need to store it into the `data segment`
-that we introduced in previous chapter and return the address. Another issue
+If we find any string literal, we need to store it into the `data segment`
+that we introduced in a previous chapter and return the address. Another issue
 is we need to care about escaped characters such as `\n` to represent newline
 character. But we don't support escaped characters other than `\n` like `\t`
-or `\r`because we aims at bootstrapping only. Note that we still support
+or `\r`because we aim at bootstrapping only. Note that we still support
 syntax that `\x` to be character `x` itself.
 
 Our lexer will analyze single character (e.g. `'a'`) at the same time. Once
@@ -361,20 +361,20 @@ Now we'll introduce the concept: `lookahead`. In the above code we see that
 for source code starting with character `/`, either 'comment' or `/(Div)` may
 be encountered.
 
-Sometimes we cannot decide which token to generate by only looking at current
-character(such as the above example about divide and comment), thus we need to
-check the next character(called `lookahead`) in order to determine. In our
+Sometimes we cannot decide which token to generate by only looking at the current
+character (such as the above example about divide and comment), thus we need to
+check the next character (called `lookahead`) in order to determine. In our
 example, if it is another slash `/`, then we've encountered a comment line,
 otherwise it is a divide operator.
 
-Like we've said that lexer and parser are inherently some kind of compiler,
-`lookahead` also exists in parser. However parser will look ahead for "token"
+Like we've said that a lexer and a parser are inherently a kind of compiler,
+`lookahead` also exists in parsers. However parsers will look ahead for "token"
 instead of "character". The `k` in `LL(k)` of compiler theory is the amount of
 tokens a parser needs to look ahead.
 
-Also if we don't split compiler into lexer and parser, the compiler will have
+Also if we don't split the compiler into a lexer and a parser, the compiler will have
 to look ahead a lot of character to decide what to do next. So we can say that
-lexer reduced the amount of lookahead a compiler need to check.
+a lexer reduces the amount of lookahead a compiler needs to check.
 
 ## Others
 
@@ -508,9 +508,9 @@ because the special meanings in it. There are two ways to deal with it:
 
 We choose the second way: add corresponding identifers into symbol table in
 advance and set the needed properties(e.g. the `Token` type we mentioned). So
-that when keywords are encountered in the source code, they will be interpret
-as identifiers, but since they already exists in the symbol table we can know
-that they are different with normal identifiers.
+that when keywords are encountered in the source code, they will be interpreted
+as identifiers, but since they already exist in the symbol table we can know
+that they are different from normal identifiers.
 
 Builtin function are similar. They are only different in the internal
 information. In the main function, add the following:
