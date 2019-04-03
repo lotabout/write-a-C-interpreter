@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#define int long long // to work with 64bit address
 
 int token;                    // current token
 int token_val;                // value of current token (mainly for number)
@@ -1251,8 +1252,11 @@ int eval() {
     return 0;
 }
 
+#undef int // Mac/clang needs this to compile
+
 int main(int argc, char **argv)
 {
+    #define int long long // to work with 64bit address
 
     int i, fd;
     int *tmp;

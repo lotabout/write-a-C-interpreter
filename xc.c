@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#define int long long // to work with 64bit address
 
 int debug;    // print the executed instructions
 int assembly; // print out the assembly and source
@@ -1276,8 +1277,12 @@ int eval() {
     }
 }
 
+#undef int // Mac/clang needs this to compile
+
 int main(int argc, char **argv)
 {
+    #define int long long // to work with 64bit address
+
     int i, fd;
     int *tmp;
 

@@ -6,7 +6,7 @@ File `xc.c` is the original one and `xc-tutor.c` is the one that I make for
 the tutorial step by step.
 
 ```
-gcc -o xc xc.c (you may need the -m32 option on 64bit machines)
+gcc -o xc xc.c
 ./xc hello.c
 ./xc -s hello.c
 
