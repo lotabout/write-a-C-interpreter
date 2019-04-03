@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#define int long long // work with 64bit target
 
 int token;            // current token
 char *src, *old_src;  // pointer to source code string;
@@ -97,8 +98,11 @@ int eval() {
     return 0;
 }
 
+#undef int // Mac/clang needs this
+
 int main(int argc, char **argv)
 {
+    #define int long long // work with 64bit target
 
     int i, fd;
 
