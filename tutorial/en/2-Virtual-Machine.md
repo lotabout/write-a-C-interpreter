@@ -319,11 +319,11 @@ int callee(int, int, int);
 
 int caller(void)
 {
-	int i, ret;
+        int i, ret;
 
-	ret = callee(1, 2, 3);
-	ret += 5;
-	return ret;
+        ret = callee(1, 2, 3);
+        ret += 5;
+        return ret;
 }
 ```
 
@@ -331,25 +331,25 @@ The compiler will generate the following assembly instructions:
 
 ```
 caller:
-	; make new call frame
-	push    ebp
-	mov     ebp, esp
+        ; make new call frame
+        push    ebp
+        mov     ebp, esp
         sub     1, esp       ; save stack for variable: i
-	; push call arguments
-	push    3
-	push    2
-	push    1
-	; call subroutine 'callee'
-	call    callee
-	; remove arguments from frame
-	add     esp, 12
-	; use subroutine result
-	add     eax, 5
-	; restore old call frame
+        ; push call arguments
+        push    3
+        push    2
+        push    1
+        ; call subroutine 'callee'
+        call    callee
+        ; remove arguments from frame
+        add     esp, 12
+        ; use subroutine result
+        add     eax, 5
+        ; restore old call frame
         mov     esp, ebp
-	pop     ebp
-	; return
-	ret
+        pop     ebp
+        ; return
+        ret
 ```
 
 The above assembly instructions cannot be achieved in our VM due to several

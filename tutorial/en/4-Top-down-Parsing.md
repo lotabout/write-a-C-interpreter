@@ -120,13 +120,13 @@ calculator can be converted into:
 <expr_tail> ::= + <term> <expr_tail>
               | - <term> <expr_tail>
               | <empty>
-              
+
 <term> ::= <factor> <term_tail>
 
 <term_tail> ::= * <factor> <term_tail>
               | / <factor> <term_tail>
               | <empty>
-              
+
 <factor> ::= ( <expr> )
            | Num
 ```
@@ -211,13 +211,13 @@ void next() {
     while (*src == ' ' || *src == '\t') {
         src ++;
     }
-    
+
     token = *src++;
-    
+
     if (token >= '0' && token <= '9' ) {
         token_val = token - '0';
         token = Num;
-        
+
         while (*src >= '0' && *src <= '9') {
             token_val = token_val*10 + *src - '0';
             src ++;
@@ -231,7 +231,7 @@ void match(int tk) {
         printf("expected token: %d(%c), got: %d(%c)\n", tk, tk, token, token);
         exit(-1);
     }
-    
+
     next();
 }
 ```

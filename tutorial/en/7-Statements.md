@@ -26,9 +26,9 @@ if (...) <statement> [else <statement>]
                                 JZ a
     <true_statement>   ===>     <true_statement>
   else:                         JMP b
-a:                           a:
-    <false_statement>           <false_statement>
-b:                           b:
+  a:                            a:
+      <false_statement>            <false_statement>
+  b:                            b:
 ```
 
 The flow of assembly code is:
