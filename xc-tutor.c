@@ -441,7 +441,7 @@ void expression(int level) {
                 // emit code, default behaviour is to load the value of the
                 // address which is stored in `ax`
                 expr_type = id[Type];
-                *++text = (expr_type == Char) ? LC : LI;
+                *++text = (expr_type == CHAR) ? LC : LI;
             }
         }
         else if (token == '(') {
