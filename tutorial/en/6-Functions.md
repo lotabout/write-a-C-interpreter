@@ -43,14 +43,14 @@ if (token == '(') {
 ...
 ```
 
-The type for current identifier(i.e. function name) had already been set
-correctly. The above chunk of code set the type(i.e. `Fun`) and the
+The type for current identifier (i.e. function name) had already been set
+correctly. The above chunk of code set the type (i.e. `Fun`) and the
 address in `text segment` for the function. Here comes `parameter_decl` and
 `body_decl`.
 
 ## Parameters and Assembly Output
 
-Before we get our hand dirty, we have to understand the assembly code that
+Before we get our hands dirty, we have to understand the assembly code that
 will be output for a function. Consider the following:
 
 ```c
@@ -62,8 +62,8 @@ int demo(int param_a, int *param_b) {
 }
 ```
 
-When `demo` is called, its calling frame(states of stack) will look like the
-following(please refer the the VM of chapter 2):
+When `demo` is called, its calling frame (states of stack) will look like the
+following (please refer to the VM of chapter 2):
 
 ```
 |    ....       | high address
@@ -83,7 +83,7 @@ following(please refer the the VM of chapter 2):
 |    ....       |  low address
 ```
 
-The key point here is no matter it is parameter(e.g. `param_a`) or local
+The key point here is no matter if it is a parameter (e.g. `param_a`) or local
 variable (e.g. `local_1`), they are all store on **stack**. Thus they are
 referred to by pointer `new_bp` and relative shfitment, while global variables
 which are stored in `text segment` are refered to by direct address. So we
