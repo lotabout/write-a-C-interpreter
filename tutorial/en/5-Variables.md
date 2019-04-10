@@ -1,7 +1,7 @@
 In this chapter we are going to use EBNF to describe the grammer of our C
-interpreter, and add the support of variable.
+interpreter, and add the support of variables.
 
-Parser is more complicated than lexer, thus we will split it into 3 parts:
+The parser is more complicated than the lexer, thus we will split it into 3 parts:
 variables, functions and expressions.
 
 ## EBNF grammar
@@ -11,7 +11,7 @@ We've talked about BNF in the previous chapter,
 Extended-BNF. If you are familiar with regular expression, you should feel
 right at home. Personally I think it is more powerful and straightforward than
 BNF. Here is the EBNF grammar of our C interpreter, feel free to skip it if
-you feel too hard to understand.
+you feel it's too hard to understand.
 
 ```
 program ::= {global_declaration}+
@@ -61,15 +61,15 @@ void program() {
 ```
 
 I know that we havn't defined `global_declaration`, sometimes we need wishful
-thinking that maybe someone(say Bob) will implement that for you. So you can
+thinking that maybe someone (say Bob) will implement that for you. So you can
 focus on the big picture at first instead of drill down into all the details.
 That's the essence of top-down thinking.
 
 ## global_declaration()
 
-Now it is our duty(not Bob's) to implement `global_declaration`. It will try
-to parse variable definition, type definition(only enum is supported) and
-function definition:
+Now it is our duty (not Bob's) to implement `global_declaration`. It will try
+to parse variable definitions, type definitions (only enum is supported) and
+function definitions:
 
 ```c
 int basetype;    // the type of a declaration, make it global for convenience

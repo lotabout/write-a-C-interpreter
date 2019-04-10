@@ -1,20 +1,20 @@
 In this chapter we will build a simple calculator using the top-down parsing
 technique. This is the preparation before we start to implement the parser.
 
-I will introduce a small set of theories but not gurantee to be absolute
+I will introduce a small set of theories but will not gurantee to be absolutely
 correct, please consult your textbook if you have any confusion.
 
 ## Top-down parsing
 
-Traditionally, we have top-down parsing and bottom-up parsing. Top-down method
-will start with a non-terminator and recursively check the source code to
+Traditionally, we have top-down parsing and bottom-up parsing. The top-down
+method will start with a non-terminator and recursively check the source code to
 replace the non-terminators with its alternatives until no non-terminator is
 left.
 
 You see I used the top-down method for explaining "top-down" because you'll
-have to know what a "non-terminator" is to understand the above graph. But I
-havn't tell you what that is. We will tell in the next section. For now,
-consider "top-down" is try to tear down a big object into small pieces.
+have to know what a "non-terminator" is to understand the above paragraph. But I
+havn't told you what that is. We will explain in the next section. For now,
+consider "top-down" is trying to tear down a big object into small pieces.
 
 On the other hand "bottom-up" parsing is trying to combine small objects into
 a big one. It is often used in automation tools that generate parsers.
@@ -39,17 +39,17 @@ arithmetic calulater in BNF will be:
            | Num
 ```
 
-The one enbraced by `<>` is called a `Non-terminator`. They got the name
-because we can replace them with the ones on the right hand of `::=`.
+The item enclosed by `<>` is called a `Non-terminator`. They got the name
+because we can replace them with the items on the right hand of `::=`.
 `|` means alternative that means you can replace `<term>` with any one of
 `<term> * <factor>`, `<term> / <factor>` or `<factor>`. Those do not appear on
 the left side of `::=` is called `Terminator` such as `+`, `(`, `Num`, etc.
-They often corresponds to the tokens we got from lexer.
+They often corresponds to the tokens we got from the lexer.
 
 ## Top-down Example for Simple Calculator
 
-Parse tree is the inner structure we got after the parser consumes all the
-tokens and finish all the parsing. Let's take `3 * (4 + 2)` as an example to
+The parse tree is the inner structure we get after the parser consumes all the
+tokens and finishes all the parsing. Let's take `3 * (4 + 2)` as an example to
 show the connections between BNF grammer, parse tree and top-down parsing.
 
 Top-down parsing starts from a starting non-terminator which is `<term>` in
@@ -71,8 +71,8 @@ non-terminator we encountered.
 ```
 
 You can see that each step we replace a non-terminator using one of its
-alternatives(top-down) Until all of the sub-items are replaced to
-terminators(bottom). Some non-terminators are used recursively such as
+alternatives (top-down) Until all of the sub-items are replaced by
+terminators (bottom). Some non-terminators are used recursively such as
 `<expr>`.
 
 ## Advantages of Top-down Parsing
@@ -110,7 +110,7 @@ As you can see, function `expr` will never exit! In the grammar,
 non-terminator `<expr>` is used recursively and appears immediately after
 `::=` which causes left-recursion.
 
-Lucily, most left-recursive grammers(maybe all? I don't remember) can be
+Lucily, most left-recursive grammers (maybe all? I don't remember) can be
 properly transformed into non left-recursive equivalent ones. Our grammar for
 calculator can be converted into:
 
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 
 You can play with your own calculator now. Or try to add some more functions
 based on what we've learned in the previous chapter. Such as variable support
-so that user can define variable to store values.
+so that a user can define variables to store values.
 
 ## Summary
 
