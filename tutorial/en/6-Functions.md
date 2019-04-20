@@ -1,13 +1,13 @@
 We've already seen how variable definitions are parsed in our interpreter. Now
-it's time for function definitions. (note it is definition, not declaration,
-thus our interpreter don't support recursion across functions.)
+it's time for function definitions (note it is definition, not declaration,
+thus our interpreter doesn't support recursion across functions).
 
 ## EBNF Grammar
 
-Let's start be refreshing our memories about EBNF grammar introduced in last
+Let's start by refreshing our memory of the EBNF grammar introduced in last
 chapter, we've already implement `program`, `global_declaration` and
 `enum_decl`. We'll deal with part of `variable_decl`, `function_decl`,
-`parameter_decl` and `body_decl`. The rest will be covered in next chapter.
+`parameter_decl` and `body_decl`. The rest will be covered in the next chapter.
 
 ```
 variable_decl ::= type {'*'} id { ',' {'*'} id } ';'
@@ -43,7 +43,7 @@ if (token == '(') {
 ...
 ```
 
-The type for current identifier (i.e. function name) had already been set
+The type for the current identifier (i.e. function name) had already been set
 correctly. The above chunk of code set the type (i.e. `Fun`) and the
 address in `text segment` for the function. Here comes `parameter_decl` and
 `body_decl`.
@@ -84,10 +84,10 @@ following (please refer to the VM of chapter 2):
 ```
 
 The key point here is no matter if it is a parameter (e.g. `param_a`) or local
-variable (e.g. `local_1`), they are all store on **stack**. Thus they are
-referred to by pointer `new_bp` and relative shfitment, while global variables
+variable (e.g. `local_1`), they are all stored on the **stack**. Thus they are
+referred to by the pointer `new_bp` and relative offsets, while global variables
 which are stored in `text segment` are refered to by direct address. So we
-need to know the number of parameters and the shiftment of each.
+need to know the number of parameters and the offset of each.
 
 ## Skeleton for Parsing Function
 
@@ -118,7 +118,7 @@ void function_declaration() {
 ```
 
 Note that we are supposed to consume the last `}` character in ①. But we don't
-because `variable_decl` and `function_decl` are parsed together(because of the
+because `variable_decl` and `function_decl` are parsed together (because of the
 same prefix in EBNF grammar) inside `global_declaration`. `variable_decl` ends
 with `;` while `function_decl` ends with `}`. If `}` is consumed, the `while`
 loop in `global_declaration` won't be able to know that a `function_decl`
@@ -296,7 +296,7 @@ The code of this chapter isn't long, most of the part are used to parse
 variables and much of them are duplicated. The parsing for parameter and local
 variables are almost the same, but the stored information are different.
 
-Of course, you may want to review the VM chapter(chapter 2) to get better
+Of course, you may want to review the VM chapter (chapter 2) to get better
 understanding of the expected output for function, so as to understand why
 would we want to gather such information. This is what we called
 "domain knowledge".
