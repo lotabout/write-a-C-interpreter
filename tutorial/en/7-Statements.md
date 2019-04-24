@@ -1,6 +1,6 @@
-We have to concept in C: statement and expression. Basically statements won't
+We have two concepts in C: statement and expression. Basically statements won't
 have a value as its result while expressions do. That means you cannot assign
-an statement to a variable.
+a statement to a variable.
 
 We have 6 statements in our interpreter:
 
@@ -34,8 +34,8 @@ if (...) <statement> [else <statement>]
 The flow of assembly code is:
 
 1. execute `<cond>`.
-2. If the condition fail, jump to positino `a`, i.e. `else` statement.
-3. Cause assembly is executed sequentially, if `<true_statement>` is executed,
+2. If the condition fails, jump to position `a`, i.e. `else` statement.
+3. Because assembly is executed sequentially, if `<true_statement>` is executed,
    we need to skip `<false_statement>`, thus a jump to `b` is needed.
 
 Corresponding C code:
@@ -104,7 +104,7 @@ Nothing worth mention. C code:
 
 ## Return
 
-Once we met `return`, it means the function is about to end, thus `LEV` is
+Once we meet `return`, it means the function is about to end, thus `LEV` is
 needed to indicate the exit.
 
 ```c
@@ -165,7 +165,7 @@ functions. You can challange yourself to fill them out first.
 
 As you can see, implementing parsing for an interpreter is not hard at all.
 But it did seems complicated because we need to gather enough knowledge during
-parsing in order to generate target code(assembly in our case). You see, that
+parsing in order to generate target code (assembly in our case). You see, that
 is one big obstacle for beginner to start implementation. So instead of
 "programming knowledge", "domain knowledge" is also required to actually
 achieve something.
