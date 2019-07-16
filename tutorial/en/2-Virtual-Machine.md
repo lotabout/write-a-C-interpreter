@@ -74,7 +74,7 @@ VM should maintain a `heap` for allocation memories. But hey, an interpreter
 itself is also a program which had its heap allocated by our computer. We can
 tell the program that we want to interpret to utilize the interpreter's heap
 by introducing an instruction `MSET`. I won't say it is cheating because it
-readuces the VM's complexity without reducing the knowledge we want to learn
+reduces the VM's complexity without reducing the knowledge we want to learn
 about compiler.
 
 Thus we adds the following codes in the global area:
