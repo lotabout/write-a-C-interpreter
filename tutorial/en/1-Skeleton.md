@@ -41,7 +41,7 @@ Modeling after c4, our compiler includes 4 main functions:
 1. `next()` for lexical analysis; get the next token; will ignore spaces tabs
    etc.
 2. `program()` main entrance for parser.
-3. `expression(level)`: parse expression; level will be explained in later
+3. `expression(level)`: parser expression; level will be explained in later
    chapter.
 4. `eval()`: the entrance for virtual machine; used to interpret target
    instructions.
