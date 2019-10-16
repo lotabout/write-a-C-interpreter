@@ -1,7 +1,7 @@
 In this chapter we will have an overview of the compiler's structure.
 
 Before we start, I'd like to restress that it is **interperter** that we want
-to build. That means we can run a C source file just lik a script. It is
+to build. That means we can run a C source file just like a script. It is
 chosen mainly for two reasons:
 
 1. Interpreter differs from Compiler only in code generation phase, thus we'll
