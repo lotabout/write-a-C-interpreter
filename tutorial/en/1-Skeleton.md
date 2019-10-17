@@ -57,6 +57,7 @@ The code is as following:
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#define int long long // work with 64bit target
 
 int token;            // current token
 char *src, *old_src;  // pointer to source code string;
