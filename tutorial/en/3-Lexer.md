@@ -18,7 +18,7 @@ Let's first look at the structure of a compiler:
 ```
 
 The Compiler can be treated as a transformer that transform C source code into
-assembly. In this sense, lexer can parser are transformers as well: Lexer
+assembly. In this sense, lexer and parser are transformers as well: Lexer
 takes C source code as input and output token stream; Parser will consume the
 token stream and generate assembly code.
 
