@@ -519,7 +519,7 @@ information. In the main function, add the following:
 // types of variable/function
 enum { CHAR, INT, PTR };
 int *idmain;                  // the `main` function
-void main() {
+int main() {
     ...
 
     src = "char else enum if int return sizeof while "
@@ -547,6 +547,7 @@ void main() {
 
     ...
     program();
+    return eval();
 }
 ```
 
