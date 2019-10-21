@@ -110,7 +110,7 @@ As you can see, function `expr` will never exit! In the grammar,
 non-terminator `<expr>` is used recursively and appears immediately after
 `::=` which causes left-recursion.
 
-Lucily, most left-recursive grammers (maybe all? I don't remember) can be
+Luckly, most left-recursive grammers (maybe all? I don't remember) can be
 properly transformed into non left-recursive equivalent ones. Our grammar for
 calculator can be converted into:
 
