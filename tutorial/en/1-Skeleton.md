@@ -1,7 +1,7 @@
 In this chapter we will have an overview of the compiler's structure.
 
 Before we start, I'd like to restress that it is **interperter** that we want
-to build. That means we can run a C source file just lik a script. It is
+to build. That means we can run a C source file just like a script. It is
 chosen mainly for two reasons:
 
 1. Interpreter differs from Compiler only in code generation phase, thus we'll
@@ -41,7 +41,7 @@ Modeling after c4, our compiler includes 4 main functions:
 1. `next()` for lexical analysis; get the next token; will ignore spaces tabs
    etc.
 2. `program()` main entrance for parser.
-3. `expression(level)`: parse expression; level will be explained in later
+3. `expression(level)`: parser expression; level will be explained in later
    chapter.
 4. `eval()`: the entrance for virtual machine; used to interpret target
    instructions.
@@ -57,6 +57,7 @@ The code is as following:
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#define int long long // work with 64bit target
 
 int token;            // current token
 char *src, *old_src;  // pointer to source code string;

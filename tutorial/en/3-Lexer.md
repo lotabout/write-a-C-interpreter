@@ -18,7 +18,7 @@ Let's first look at the structure of a compiler:
 ```
 
 The Compiler can be treated as a transformer that transform C source code into
-assembly. In this sense, lexer can parser are transformers as well: Lexer
+assembly. In this sense, lexer and parser are transformers as well: Lexer
 takes C source code as input and output token stream; Parser will consume the
 token stream and generate assembly code.
 
@@ -519,7 +519,7 @@ information. In the main function, add the following:
 // types of variable/function
 enum { CHAR, INT, PTR };
 int *idmain;                  // the `main` function
-void main() {
+int main(int argc, char **argv) {
     ...
 
     src = "char else enum if int return sizeof while "
@@ -547,6 +547,7 @@ void main() {
 
     ...
     program();
+    return eval();
 }
 ```
 
