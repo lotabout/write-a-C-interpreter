@@ -14,7 +14,7 @@ The precedence of operators means we should compute some operators before
 others even though the latter may show up first. For example: operator `*`
 has higher precedence than operator `+`, so that in expression `2 + 3 * 4`,
 the correct calculation result is `2 + (3 * 4)` instead of `(2 + 3) * 4` even
-though `+` comes before `+`.
+though `+` comes before `*`.
 
 C programming language had already defined the precedence for various
 operators, you can refer to [Operator
@@ -27,7 +27,7 @@ we'll get the result through the following steps:
 1. push `2` onto the stack.
 2. operator `+` is met, push it onto the stack, now we are expecting the other
    argument for `+`.
-3. `3` is met, push it onto the stack. We are suppose to calculate `2+3`
+3. `3` is met, push it onto the stack. We are supposed to calculate `2+3`
    immediately, but we are not sure whether `3` belongs to the operator with
    higher precedence, so leave it there.
 4. operator `-` is met. `-` has the same precedence as `+`, so we are sure
@@ -168,7 +168,7 @@ else if (token == Sizeof) {
 }
 ```
 
-Note that only `sizeof(int)`, `sizeof(char)` and `sizeof(pointer type ...)`
+Note that only `sizeof(int)`, `sizeof(char)` (which by the way, is always `1` - by definition) and `sizeof(pointer type ...)`
 are supported, and the type of the result is `int`.
 
 ### Variable and function invocation
