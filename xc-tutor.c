@@ -1074,8 +1074,7 @@ void function_declaration() {
 
 void enum_declaration() {
     // parse enum [id] { a = 1, b = 3, ...}
-    int i;
-    i = 0;
+    int i = 0;
     while (token != '}') {
         if (token != Id) {
             printf("%d: bad enum identifier %d\n", line, token);
