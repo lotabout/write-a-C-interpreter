@@ -1,0 +1,39 @@
+# https://editorconfig.org
+
+root = true
+
+
+## Repository Configurations
+############################
+[.{git*,editorconfig,*.yml}]
+end_of_line = lf
+indent_style = space
+indent_size = unset
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[.gitmodules]
+indent_style = tab
+
+
+## Markdown GFM
+###############
+[*.md]
+indent_style = space
+indent_size = unset
+end_of_line = unset
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+
+## C Source Files
+#################
+[*.{c,h}]
+indent_style = space
+indent_size = 4
+end_of_line = unset
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
