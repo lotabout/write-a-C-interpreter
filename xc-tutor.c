@@ -1213,8 +1213,6 @@ int eval() {
         else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
         else if (op == ADJ)  {sp = sp + *pc++;}                                // add esp, <size>
         else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restore call frame and PC
-        else if (op == ADJ)  {sp = sp + *pc++;}                                // add esp, <size>
-        else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restore call frame and PC
         else if (op == LEA)  {ax = (int)(bp + *pc++);}                         // load address for arguments.
 
         else if (op == OR)  ax = *sp++ | ax;
