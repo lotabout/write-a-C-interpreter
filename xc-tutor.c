@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
-#define int long long // to work with 64bit address
+#include <stdint.h>
+#define int intptr_t
 
 int token;                    // current token
 int token_val;                // value of current token (mainly for number)
@@ -1213,9 +1214,6 @@ int eval() {
         else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
         else if (op == ADJ)  {sp = sp + *pc++;}                                // add esp, <size>
         else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restore call frame and PC
-        else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
-        else if (op == ADJ)  {sp = sp + *pc++;}                                // add esp, <size>
-        else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restore call frame and PC
         else if (op == LEA)  {ax = (int)(bp + *pc++);}                         // load address for arguments.
 
         else if (op == OR)  ax = *sp++ | ax;
@@ -1236,7 +1234,7 @@ int eval() {
         else if (op == MOD) ax = *sp++ % ax;
 
 
-        else if (op == EXIT) { printf("exit(%d)", *sp); return *sp;}
+        else if (op == EXIT) { printf("exit(%d)\n", *sp); return *sp;}
         else if (op == OPEN) { ax = open((char *)sp[1], sp[0]); }
         else if (op == CLOS) { ax = close(*sp);}
         else if (op == READ) { ax = read(sp[2], (char *)sp[1], *sp); }
@@ -1256,7 +1254,7 @@ int eval() {
 
 int main(int argc, char **argv)
 {
-    #define int long long // to work with 64bit address
+    #define int intptr_t
 
     int i, fd;
     int *tmp;
@@ -1266,11 +1264,6 @@ int main(int argc, char **argv)
 
     poolsize = 256 * 1024; // arbitrary size
     line = 1;
-
-    if ((fd = open(*argv, 0)) < 0) {
-        printf("could not open(%s)\n", *argv);
-        return -1;
-    }
 
     // allocate memory for virtual machine
     if (!(text = old_text = malloc(poolsize))) {
