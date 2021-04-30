@@ -1,5 +1,7 @@
+# 7. Statements
+
 We have two concepts in C: statement and expression. Basically statements won't
-have a value as its result while expressions do. That means you cannot assign
+have a value as their result while expressions do. That means you cannot assign
 a statement to a variable.
 
 We have 6 statements in our interpreter:
@@ -9,15 +11,16 @@ We have 6 statements in our interpreter:
 3. `{ <statement> }`
 4. `return xxx;`
 5. `<empty statement>`;
-6. `expression;` (expression end with semicolon)
+6. `expression;` (expression ends with semicolon)
 
 The parsing job is relatively easy compared to understanding the expected
-assembly output. Let's explain one by one.
+Assembly output. Let's explain them one by one.
+
 
 ## IF
 
-`if` statement is to jump to a different location according to the condition.
-Let's check its pseudo cdoe:
+An `if` statement serves to jump to a different location according to the
+condition. Let's check its pseudo cdoe:
 
 ```
 if (...) <statement> [else <statement>]
@@ -31,12 +34,12 @@ if (...) <statement> [else <statement>]
   b:                            b:
 ```
 
-The flow of assembly code is:
+The flow of Assembly code is:
 
 1. execute `<cond>`.
 2. If the condition fails, jump to position `a`, i.e. `else` statement.
-3. Because assembly is executed sequentially, if `<true_statement>` is executed,
-   we need to skip `<false_statement>`, thus a jump to `b` is needed.
+3. Because assembly is executed sequentially, if `<true_statement>` is
+   executed, we need to skip `<false_statement>`, thus a jump to `b` is needed.
 
 Corresponding C code:
 
@@ -66,6 +69,7 @@ Corresponding C code:
     }
 ```
 
+
 ## While
 
 `while` is simplier than `if`:
@@ -79,7 +83,7 @@ a:                     a:
 b:                     b:
 ```
 
-Nothing worth mention. C code:
+Nothing worth mentioning. C code:
 
 ```c
     else if (token == While) {
@@ -102,10 +106,11 @@ Nothing worth mention. C code:
     }
 ```
 
+
 ## Return
 
-Once we meet `return`, it means the function is about to end, thus `LEV` is
-needed to indicate the exit.
+When we encounter `return`, it means the function is about to end, thus `LEV`
+is needed to indicate the exit.
 
 ```c
     else if (token == Return) {
@@ -123,10 +128,11 @@ needed to indicate the exit.
     }
 ```
 
-## Others
 
-Other statement acts as helpers for compiler to group the codes better. They
-won't generate assembly codes. As follows:
+## Other Statements
+
+Other statements act as helpers for the compiler to better organize the code in
+groups. They won't generate Assembly code. As follows:
 
 ```c
     else if (token == '{') {
@@ -150,25 +156,29 @@ won't generate assembly codes. As follows:
     }
 ```
 
-## Code
 
-You can download the code of this chapter from [Github](https://github.com/lotabout/write-a-C-interpreter/tree/step-5), or clone with:
+## Source Code
+
+You can download the code of this chapter from
+[GitHub](https://github.com/lotabout/write-a-C-interpreter/tree/step-5),
+or clone with:
 
 ```
 git clone -b step-5 https://github.com/lotabout/write-a-C-interpreter
 ```
 
-The code still won't run because there are still some un-implemented
-functions. You can challange yourself to fill them out first.
+The code still won't run because there are still some unimplemented
+functions. You can challenge yourself to fill them out first.
+
 
 ## Summary
 
 As you can see, implementing parsing for an interpreter is not hard at all.
 But it did seems complicated because we need to gather enough knowledge during
-parsing in order to generate target code (assembly in our case). You see, that
-is one big obstacle for beginner to start implementation. So instead of
-"programming knowledge", "domain knowledge" is also required to actually
+parsing in order to generate target code (Assembly in our case). You see,
+that's a major obstacle for beginners to start the implementation. So instead
+of "programming knowledge", "domain knowledge" is also required to actually
 achieve something.
 
-Thus I suggest you to learn assembly if you haven't, it is not difficult but
+Thus I suggest you to learn Assembly if you haven't, it is not difficult but
 helpful to understand how computers work.
