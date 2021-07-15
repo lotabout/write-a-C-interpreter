@@ -157,7 +157,11 @@ void next() {
                 while (*src != 0 && *src != '\n') {
                     ++src;
                 }
-            } else {
+            } else if (*src == '*') {
+              while(*src != '*' && src != '/'){
+                     ++src;
+              }
+            }else {
                 // divide operator
                 token = Div;
                 return;
