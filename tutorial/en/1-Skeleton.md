@@ -142,7 +142,7 @@ git clone -b step-0 https://github.com/lotabout/write-a-C-interpreter
 ```
 
 Note that I might fix bugs later, and if there is any incosistance between the
-artical and the code branches, follow the article. I would only update code in
+article and the code branches, follow the article. I would only update code in
 the master branch.
 
 ## Summary
