@@ -1,10 +1,12 @@
+# 3. The Lexer
+
 > lexical analysis is the process of converting a sequence of characters (such
 > as in a computer program or web page) into a sequence of tokens (strings with
 > an identified "meaning").
 
-Normally we represent the token as a pair: `(token type, token value)`. For
-example, if a program's source file contains string: "998", the lexer will
-treat it as token `(Number, 998)` meaning it is a number with value of `998`.
+Normally we represent the token as a pair: `(token type, token value)`.
+For example, if a program's source file contains the string "998", the lexer
+will treat it as token `(Number, 998)`, meaning it's a number with value `998`.
 
 
 ## Lexer vs Compiler
@@ -17,36 +19,39 @@ Let's first look at the structure of a compiler:
                    +-------+                      +--------+
 ```
 
-The Compiler can be treated as a transformer that transform C source code into
-assembly. In this sense, lexer and parser are transformers as well: Lexer
-takes C source code as input and output token stream; Parser will consume the
-token stream and generate assembly code.
+The compiler can be treated as a transformer that transform C source code into
+Assembly. In this sense, both lexer and parser are transformers as well: the
+lexer takes C source code as input and outputs a token stream; the parser will
+consume the token stream and generate Assembly code.
 
-Then why do we need lexer and a parser? Well the Compiler's job is hard! So we
-recruit lexer to do part of the job and parser to do the rest so that each
-will need to deal with simple one only.
+Then why do we need lexer and a parser? Well the compiler's job is hard! So we
+recruit the lexer to do part of the job, and the parser to do the rest of it,
+so that each will only need to deal with a single and simple job.
 
 That's the value of a lexer: to simplify the parser by converting the stream
-of source code into token stream.
+of source code into a stream of tokens.
+
 
 ## Implementation Choice
 
 Before we start I want to let you know that crafting a lexer is boring and
-error-prone. That's why geniuses out there had already created automation
-tools to do the job. `lex/flex` are example that allows us to describe the
-lexical rules using regular expressions and generate lexer for us.
+error-prone. That's why geniuses out there have already created automation
+tools to do the job. Tools like `lex/flex` allow us to describe the lexical
+rules using regular expressions and then generate a lexer for us.
 
-Also note that we won't follow the graph in the section above, i.e. not
-converting all source code into token stream at once. The reasons are:
+Also note that we won't follow the graph shown in the previous section, i.e.
+we won't be converting all the source code into a token stream at once. The
+reasons being:
 
-1. Converting source code into token stream is stateful. How a string is
-   interpreted is related with the place where it appears.
-2. It is a waste to store all the tokens because only a few of them will be
-   accessed at the same time.
+1. Converting source code into token stream is stateful.
+   How a string is interpreted depends on the context where it appears.
+2. storing all the tokens is a waste, because only a few of them will be
+   accessed at any given time.
 
-Thus we'll implement one function: `next()` that returns a token in one call.
+Thus we'll implement the `next()` function, which returns one token per call.
 
-## Tokens Supported
+
+## Supported Tokens
 
 Add the definition into the global area:
 
@@ -59,23 +64,26 @@ enum {
 };
 ```
 
-These are all the tokens our lexer can understand. Our lexer will interpret
+These are all the tokens our lexer can understand. Our lexer will interpret the
 string `=` as token `Assign`; `==` as token `Eq`; `!=` as `Ne`; etc.
 
 So we have the impression that a token will contain one or more characters.
-That is the reason why lexer can reduce the complexity, now the parser doesn't
-have to look at several character to identify a the meaning of a substring.
-The job had been done.
+This is the reason why the lexer can reduce complexity, now the parser doesn't
+have to look at several character to identify the meaning of a substring — this
+job has already be taken care of.
 
-Of course, the tokens above is properly ordered reflecting their priority in
-the C programming language. `*(Mul)` operator for example has higher priority
-the `+(Add)` operator. We'll talk about it later.
+Of course, the tokens above are properly ordered reflecting their priority in
+the C programming language. The `*(Mul)` operator, for example, has higher
+priority than the `+(Add)` operator. We'll talk more about this later.
 
-At last, there are some characters we don't included here are themselves a
-token such as `]` or `~`. The reason that we done encode them like others are:
+Finally, there are some characters we didn't include here, although they are
+tokens themselves, such as `]` or `~`. The reason why we're not encoding them
+like the others are:
 
-1. These tokens contains only single character, thus are easier to identify.
+1. These tokens consist of just a single character, therefore they're easier
+   to identify.
 2. They are not involved into the priority battle.
+
 
 ## Skeleton of Lexer
 
@@ -91,23 +99,25 @@ void next() {
 }
 ```
 
-While do we need `while` here knowing that `next` will only parse one token?
-This raises a quesion in compiler construction(remember that lexer is kind of
-compiler?): How to handle error?
+Why do we need a `while` here, knowing that `next()` will only parse one token?
+This raises a question in compiler construction (remember that lexer is kind of
+compiler?): How to handle errors?
 
-Normally we had two solutions:
+Normally we have two solutions:
 
-1. points out where the error happans and quit.
-2. points out where the error happans, skip it, and continue.
+1. Point out where the error occurred, and quit.
+2. Point out where the error occurred, skip it, and continue.
 
-That will explain the existance of `while`: to skip unknown characters in the
-source code. Meanwhile it is used to skip whitespaces which is not the actual
+These explains the presence of `while`: to skip unknown characters in the
+source code. Meanwhile, it's used to skip whitespace, which is not actually
 part of a program. They are treated as separators only.
+
 
 ## Newline
 
-It is quite like space in that we are skipping it. The only difference is that
-we need to increase the line number once a newline character is met:
+A newline is similar to whitespace, because we're' skipping it. The only
+difference is that we need to increase the line number whenever a newline
+character is encountered:
 
 ```c
 // parse token here
@@ -120,8 +130,8 @@ if (token == '\n') {
 
 ## Macros
 
-Macros in C starts with character `#` such as `#include <stdio.h>`. Our
-compiler don't support any macros, so we'll skip all of them:
+Macros in C start with character `#`, e.g. `#include <stdio.h>`.
+Our compiler doesn't support any macros, so we'll skip all of them:
 
 ```c
 else if (token == '#') {
@@ -132,19 +142,20 @@ else if (token == '#') {
 }
 ```
 
-## Identifers and Symbol Table
 
-Identifier is the name of a variable. But we don't actually care about the
-names in lexer, we cares about the identity. For example: `int a;`
-declares a variable, we have to know that the statement `a = 10` that comes
-after refers to the same variable that we declared before.
+## Identifiers and Symbol Table
+
+An identifier is the name of a variable. But we don't actually care about the
+names in lexer, we care about the identity. For example: `int a;` declares a
+variable, we have to know that the statement `a = 10` that comes after refers
+to the same variable that we declared before.
 
 Based on this reason, we'll make a table to store all the names we've already
-met and call it Symbol Table. We'll look up the table when a new
-name/identifier is accountered. If the name exists in the symbol table, the
+met and call it Symbol Table. We'll look up the table whenever a new
+name/identifier is encountered. If the name exists in the symbol table, its
 identity is returned.
 
-Then how to represent an identity?
+Then, how do we represent an identity?
 
 ```c
 struct identifier {
@@ -162,25 +173,24 @@ struct identifier {
 
 We'll need a little explanation here:
 
-1. `token`: is the token type of an identifier. Theoretically it should be
-   fixed to type `Id`. But it is not true because we will add keywords(e.g
-   `if`, `while`) as special kinds of identifier.
-2. `hash`: the hash value of the name of the identifier, to speed up the
-   comparision of table lookup.
-3. `name`: well, name of the identifier.
-4. `class`: Whether the identifier is global, local or constants.
+1. `token`: is the token type of an identifier.
+   Theoretically it should be fixed to type `Id`. But it is not true because we
+   will add keywords (e.g `if`, `while`) as special kinds of identifier.
+2. `hash`: the hash value of the identifier's name, to speed up comparisons
+   during table lookup operations.
+3. `name`: well, the identifier's name.
+4. `class`: Whether the identifier is global, local or constant.
 5. `type`: type of the identifier, `int`, `char` or pointer.
 6. `value`: the value of the variable that the identifier points to.
-7. `BXXX`: local variable can shadow global variable. It is used to store
-   global ones if that happens.
+7. `BXXX`: local variables can [shadow] global variables.
+   It's used to store global ones, if that happens.
 
-Traditional symbol table will contain only the unique identifer while our
-symbol table stores other information that will only be accessed by parser
+A traditional symbol table will contain only the unique identifier, whereas our
+symbol table stores other information that will only be accessed by the parser,
 such as `type`.
 
-Yet sadly, our compiler do not support `struct` while we are trying to be
-bootstrapping. So we have to compromise in the actual structure of an
-identifier:
+Yet sadly, our compiler won't support `struct` while we are trying to bootstrap
+it. So we have to compromise in the actual structure of an identifier:
 
 ```
 Symbol table:
@@ -190,8 +200,8 @@ Symbol table:
     |<---       one single identifier                --->|
 ```
 
-That means we use a single `int` array to store all identifier information.
-Each ID will use 9 cells. The code is as following:
+This means we use a single `int` array to store all identifier information.
+Each ID will use 9 cells. The code is as follows:
 
 ```c
 int token_val;                // value of current token (mainly for number)
@@ -229,12 +239,13 @@ void next() {
 }
 ```
 
-Note that the search in symbol table is linear search.
+Note that the search in the symbol table is a linear search.
+
 
 ## Number
 
 We need to support decimal, hexadecimal and octal. The logic is quite
-straightforward except how to get the hexadecimal value. Maybe..
+straightforward, except how to get the hexadecimal value. Maybe.
 
 ```c
 token_val = token_val * 16 + (token & 0x0F) + (token >= 'A' ? 9 : 0);
@@ -286,14 +297,14 @@ void next() {
 
 ## String Literals
 
-If we find any string literal, we need to store it into the `data segment`
-that we introduced in a previous chapter and return the address. Another issue
-is we need to care about escaped characters such as `\n` to represent newline
-character. But we don't support escaped characters other than `\n` like `\t`
-or `\r`because we aim at bootstrapping only. Note that we still support
-syntax that `\x` to be character `x` itself.
+If we encounter a string literal, we need to store it into the `data segment`
+that we introduced in a previous chapter, and return its address. Another issue
+we need to care about are escaped characters, e.g. `\n` to represent a newline
+character. But we won't support escaped characters other than `\n` (like `\t`
+or `\r`) because we're aiming at bootstrapping only. Note that we still support
+the syntax where `\x` represent the `x` character itself.
 
-Our lexer will analyze single character (e.g. `'a'`) at the same time. Once
+Our lexer will analyze a single character (e.g. `'a'`) at the same time. Once a
 character is found, we return it as a `Num`.
 
 ```c
@@ -333,8 +344,8 @@ void next() {
 
 ## Comments
 
-Only C++ style comments(e.g. `// comment`) is supported. C style (`/* ... */`)
-is not supported.
+Only C++ style comments (e.g. `// comment`) are supported.
+C style comments (`/* ... */`) are not supported.
 
 ```c
 void next() {
@@ -357,14 +368,14 @@ void next() {
 }
 ```
 
-Now we'll introduce the concept: `lookahead`. In the above code we see that
+Now we'll introduce a new concept: `lookahead`. In the above code we see that
 for source code starting with character `/`, either 'comment' or `/(Div)` may
 be encountered.
 
-Sometimes we cannot decide which token to generate by only looking at the current
-character (such as the above example about divide and comment), thus we need to
-check the next character (called `lookahead`) in order to determine. In our
-example, if it is another slash `/`, then we've encountered a comment line,
+Sometimes we cannot decide which token to generate by only looking at the
+current character (such as the above example about divide and comment), thus we
+need to check the next character (called `lookahead`) in order to determine. In
+our example, if it is another slash `/`, then we've encountered a comment line,
 otherwise it is a divide operator.
 
 Like we've said that a lexer and a parser are inherently a kind of compiler,
@@ -372,13 +383,14 @@ Like we've said that a lexer and a parser are inherently a kind of compiler,
 instead of "character". The `k` in `LL(k)` of compiler theory is the amount of
 tokens a parser needs to look ahead.
 
-Also if we don't split the compiler into a lexer and a parser, the compiler will have
-to look ahead a lot of character to decide what to do next. So we can say that
-a lexer reduces the amount of lookahead a compiler needs to check.
+Also, if we don't split the compiler into a lexer and a parser, the compiler
+will have to look ahead a lot of characters to decide what to do next. So we
+can say that a lexer reduces the amount of lookahead a compiler needs to check.
 
-## Others
 
-Others are simpiler and straightforward, check the code:
+## Other Tokens
+
+The remaining tokes are simpler and straightforward, check the code:
 
 ```c
 void next() {
@@ -496,23 +508,23 @@ void next() {
 }
 ```
 
-## Keywords and Builtin Functions
+## Keywords and Built-in Functions
 
 Keywords such as `if`, `while` or `return` are special because they are known
 by the compiler in advance. We cannot treat them like normal identifiers
-because the special meanings in it. There are two ways to deal with it:
+because they have special meanings. There are two ways to deal with it:
 
 1. Let lexer parse them and return a token to identify them.
 2. Treat them as normal identifier but store them into the symbol table in
    advance.
 
-We choose the second way: add corresponding identifers into symbol table in
-advance and set the needed properties(e.g. the `Token` type we mentioned). So
-that when keywords are encountered in the source code, they will be interpreted
+We choose the second path: add corresponding identifiers into the symbol table
+in advance and set the needed properties (e.g. the `Token` type we mentioned).
+So, when keywords are encountered in the source code, they will be interpreted
 as identifiers, but since they already exist in the symbol table we can know
 that they are different from normal identifiers.
 
-Builtin function are similar. They are only different in the internal
+Built-in function are similar. They are only different in their internal
 information. In the main function, add the following:
 
 ```c
@@ -551,28 +563,36 @@ int main(int argc, char **argv) {
 }
 ```
 
-## Code
+
+## Source Code
 
 You can check out the code on
-[Github](https://github.com/lotabout/write-a-C-interpreter/tree/step-2), or
-clone with:
+[GitHub](https://github.com/lotabout/write-a-C-interpreter/tree/step-2),
+or clone with:
 
 ```
 git clone -b step-2 https://github.com/lotabout/write-a-C-interpreter
 ```
 
-Executing the code will give 'Segmentation Falt' because it will try to
-execute the virtual machine that we build in previous chapter which will not
-work because it doesn't contain any runnable code.
+Executing the code will raise a 'Segmentation Fault' because it will try to
+execute the virtual machine that we've build in the previous chapter, which
+won't work because it doesn't contain any runnable code.
+
 
 ## Summary
 
-1. Lexer is used to pre-process the source code, so as to reduce the
-   complexity of parser.
-2. Lexer is also a kind of compiler which consumes source code and output
-   token stream.
-3. `lookahead(k)` is used to fully determine the meaning of current
+1. Lexer is used to pre-process the source code, in order to reduce the
+   complexity of the parser.
+2. Lexer is also a kind of compiler which consumes source code and outputs
+   a token stream.
+3. `lookahead(k)` is used to fully determine the meaning of the current
    character/token.
-4. How to represent identifier and symbol table.
+4. How to represent identifiers and the symbol table.
 
-We will discuss about top-down recursive parser. See you then :)
+We will discuss about top-down recursive parser. See you then. :smile:
+
+<!-----------------------------------------------------------------------------
+                               REFERENCE LINKS
+------------------------------------------------------------------------------>
+
+[shadow]: https://en.wikipedia.org/wiki/Variable_shadowing "Wikipedia » Variable shadowing"

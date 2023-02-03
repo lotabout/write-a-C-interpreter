@@ -1,30 +1,34 @@
-In this chapter we will build a simple calculator using the top-down parsing
-technique. This is the preparation before we start to implement the parser.
+# 4. Top-down Parsing
 
-I will introduce a small set of theories but will not gurantee to be absolutely
-correct, please consult your textbook if you have any confusion.
+In this chapter we will build a simple calculator using the [top-down parsing]
+technique. This is just preparation work, before we start to implement the
+parser.
 
-## Top-down parsing
+I will introduce a small set of theories, but can't guarantee them to be
+absolutely correct, please consult your textbook if you have any confusion.
 
-Traditionally, we have top-down parsing and bottom-up parsing. The top-down
-method will start with a non-terminator and recursively check the source code to
-replace the non-terminators with its alternatives until no non-terminator is
-left.
+
+## Top-down Parsers
+
+Traditionally, we have top-down parsing and [bottom-up parsing]. The top-down
+method will start with a non-terminator and recursively check the source code
+to replace every non-terminators with its alternatives, until no
+non-terminator is left.
 
 You see I used the top-down method for explaining "top-down" because you'll
-have to know what a "non-terminator" is to understand the above paragraph. But I
-havn't told you what that is. We will explain in the next section. For now,
-consider "top-down" is trying to tear down a big object into small pieces.
+have to know what a "non-terminator" is to understand the previous paragraph.
+But I haven't told you what that is. We will explain it in the next section.
+For now, consider "top-down" as trying to tear down a big object into small
+pieces.
 
-On the other hand "bottom-up" parsing is trying to combine small objects into
-a big one. It is often used in automation tools that generate parsers.
+On the other hand, "bottom-up" parsing is trying to combine small objects into
+a bigger one. It is often used in automation tools that generate parsers.
 
-## Terminator and Non-terminator
 
-They are terms used in
-[BNF](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form) (Backus–Naur
-Form) which is a language used to describe grammars. A simple elementary
-arithmetic calulater in BNF will be:
+## Terminators and Non-terminators
+
+They are terms used in [BNF]  (Backus–Naur Form), which is a language used to
+describe grammars. A simple elementary arithmetic calculator in BNF will be:
 
 ```
 <expr> ::= <expr> + <term>
@@ -39,22 +43,24 @@ arithmetic calulater in BNF will be:
            | Num
 ```
 
-The item enclosed by `<>` is called a `Non-terminator`. They got the name
-because we can replace them with the items on the right hand of `::=`.
-`|` means alternative that means you can replace `<term>` with any one of
-`<term> * <factor>`, `<term> / <factor>` or `<factor>`. Those do not appear on
-the left side of `::=` is called `Terminator` such as `+`, `(`, `Num`, etc.
-They often corresponds to the tokens we got from the lexer.
+Item enclosed by `<>` are called *Non-terminators*. They got that name because
+we can replace them with the items on the right hand side of `::=`. `|` means
+alternative, i.e. you can replace `<term>` with any one of
+`<term> * <factor>`, `<term> / <factor>` or `<factor>`.
+Those which do not appear on the left side of `::=` are called *Terminators*,
+such as `+`, `(`, `Num`, etc. They often corresponds to the tokens we get from
+the lexer.
 
-## Top-down Example for Simple Calculator
+
+## Top-down Example of a Simple Calculator
 
 The parse tree is the inner structure we get after the parser consumes all the
 tokens and finishes all the parsing. Let's take `3 * (4 + 2)` as an example to
-show the connections between BNF grammer, parse tree and top-down parsing.
+show the connections between BNF grammar, parse tree and top-down parsing.
 
-Top-down parsing starts from a starting non-terminator which is `<term>` in
-our example. You can specify it in practice, but also defaults to the first
-non-terminator we encountered.
+Top-down parsing beings from a starting non-terminator, which is `<term>` in
+our example. You can specify it in real practice, but also defaults to the
+first non-terminator encountered.
 
 ```
 1. <expr> => <expr>
@@ -71,27 +77,30 @@ non-terminator we encountered.
 ```
 
 You can see that each step we replace a non-terminator using one of its
-alternatives (top-down) Until all of the sub-items are replaced by
+alternatives (top-down) until all of the sub-items are replaced by
 terminators (bottom). Some non-terminators are used recursively such as
 `<expr>`.
 
+
 ## Advantages of Top-down Parsing
 
-As you can see in the above example, the parsing step is similar to the BNF
+As you can see in the above example, the parsing steps are similar to the BNF
 grammar. Which means it is easy to convert the grammar into actual code by
 converting a production rule (`<...> ::= ...`) into a function with the same
 name.
 
 One question arises here: how do you know which alternative to apply? Why do
 you choose `<expr> ::= <term> * <factor>` over `<expr> ::= <term> / <factor>`?
-That's right, we `lookahead`! We peek the next token and it is `*` so it is the
-first one to apply.
+That's right, with `lookahead`! We peek the next token, which is `*`, so it's
+the first one to apply.
 
-However, top-down parsing requires the grammar should not have left-recursion.
+However, top-down parsing requires that the grammar doesn't contain
+left-recursion.
+
 
 ## Left-recursion
 
-Suppose we have a grammer like this:
+Suppose we have a grammar like this:
 
 ```
 <expr> ::= <expr> + Num
@@ -106,13 +115,13 @@ int expr() {
 }
 ```
 
-As you can see, function `expr` will never exit! In the grammar,
-non-terminator `<expr>` is used recursively and appears immediately after
-`::=` which causes left-recursion.
+As you can see, function `expr` will never exit! In the grammar, the `<expr>`
+non-terminator is used recursively and appears immediately after `::=`, which
+causes left-recursion.
 
-Luckly, most left-recursive grammers (maybe all? I don't remember) can be
-properly transformed into non left-recursive equivalent ones. Our grammar for
-calculator can be converted into:
+Luckily, most left-recursive grammars (maybe all? I don't remember) can be
+properly transformed into non left-recursive equivalents. Our calculator
+grammar can be converted into:
 
 ```
 <expr> ::= <term> <expr_tail>
@@ -132,6 +141,7 @@ calculator can be converted into:
 ```
 
 You should check out your textbook for more information.
+
 
 ## Implementation
 
@@ -193,7 +203,9 @@ int expr() {
 }
 ```
 
-Implmenting a top-down parser is straightforward with the help of BNF grammar.
+Implementing a top-down parser is straightforward with the help of a BNF
+grammar.
+
 We now add the code for lexer:
 
 ```c
@@ -253,15 +265,24 @@ int main(int argc, char *argv[])
 ```
 
 You can play with your own calculator now. Or try to add some more functions
-based on what we've learned in the previous chapter. Such as variable support
+based on what we've learned in the previous chapter. Such as variable support,
 so that a user can define variables to store values.
+
 
 ## Summary
 
-We don't like theory, but it exists for good reason as you can see that BNF can
-help us to build the parser. So I want to convice you to learn some theories,
-it will help you to become a better programmer.
+We don't like theory, but it exists for a good reason as you can see that BNF
+can help us to build the parser. So I want to convince you to learn some
+theory, it will help you to become a better programmer.
 
-Top-down parsing technique is often used in manually crafting of parsers, so
-you are able to handle most jobs if you master it! As you'll see in laster
+The top-down parsing technique is often used when crafting parsers manually,
+so you'll be able to handle most jobs if you master it! As you'll see in later
 chapters.
+
+<!-----------------------------------------------------------------------------
+                               REFERENCE LINKS
+------------------------------------------------------------------------------>
+
+[BNF]: https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form "Wikipedia: Backus–Naur form"
+[bottom-up parsing]: https://en.wikipedia.org/wiki/Bottom-up_parsing "Wikipedia » Bottom-up parsing"
+[top-down parsing]: https://en.wikipedia.org/wiki/Top-down_parsing "Wikipedia » Top-down parsing"
