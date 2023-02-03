@@ -67,7 +67,7 @@ That is the reason why lexer can reduce the complexity, now the parser doesn't
 have to look at several character to identify a the meaning of a substring.
 The job had been done.
 
-Of course, the tokens above is properly ordered reflecting their priority in
+Of course, the tokens above are properly ordered reflecting their priority in
 the C programming language. `*(Mul)` operator for example has higher priority
 the `+(Add)` operator. We'll talk about it later.
 
