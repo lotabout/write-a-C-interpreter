@@ -283,4 +283,216 @@ void next() {
         ...
 }
 ```
+## Literais de String
 
+Se encontrarmos qualquer literal de string, precisamos armazená-lo no `segmento de dados`
+que introduzimos em um capítulo anterior e retornar o endereço. Outra questão
+é que precisamos nos preocupar com caracteres de escape, como `\n` para representar o caractere de nova linha. Mas não suportamos caracteres de escape além de `\n`, como `\t`
+ou `\r` porque nosso objetivo é apenas a inicialização. Note que ainda suportamos
+a sintaxe que `\x` seja o caractere `x` em si.
+
+Nosso analisador léxico analisará um único caractere (por exemplo, `'a'`) ao mesmo tempo. Uma vez
+que o caractere é encontrado, o retornamos como um `Num`.
+
+```c
+void next() {
+        ...
+
+        else if (token == '"' || token == '\'') {
+            // analisa literal de string, atualmente, o único caractere de escape suportado
+            // é '\n', armazene o literal de string nos dados.
+            last_pos = data;
+            while (*src != 0 && *src != token) {
+                token_val = *src++;
+                if (token_val == '\\') {
+                    // caractere de escape
+                    token_val = *src++;
+                    if (token_val == 'n') {
+                        token_val = '\n';
+                    }
+                }
+                if (token == '"') {
+                    *data++ = token_val;
+                }
+            }
+
+            src++;
+            // se for um único caractere, retorne o token Num
+            if (token == '"') {
+                token_val = (int)last_pos;
+            } else {
+                token = Num;
+            }
+
+            return;
+        }
+}
+``` 
+
+
+## Comentários
+
+Apenas comentários no estilo C++ (por exemplo, `// comentário`) são suportados. O estilo C (`/* ... */`)
+não é suportado.
+
+```c
+
+void next() {
+        ...
+
+        else if (token == '/') {
+            if (*src == '/') {
+                // pula comentários
+                while (*src != 0 && *src != '\n') {
+                    ++src;
+                }
+            } else {
+                // operador de divisão
+                token = Div;
+                return;
+            }
+        }
+
+        ...
+}
+
+```
+Agora, introduziremos o conceito: `lookahead` (antecipação). No código acima, vemos que
+para o código-fonte começando com o caractere `/`, pode-se encontrar 'comentário' ou `/(Div)`.
+
+Às vezes, não podemos decidir qual token gerar apenas olhando para o caractere atual
+(como o exemplo acima sobre divisão e comentário), assim precisamos
+verificar o próximo caractere (chamado `lookahead`) para determinar. Em nosso
+exemplo, se for outra barra `/`, então encontramos uma linha de comentário,
+caso contrário, é um operador de divisão.
+
+Como dissemos que um analisador léxico e um analisador sintático são inerentemente um tipo de compilador,
+`lookahead` também existe em analisadores sintáticos. No entanto, os analisadores vão olhar para "token"
+em vez de "caractere". O `k` em `LL(k)` da teoria do compilador é a quantidade de
+tokens que um analisador precisa antecipar.
+
+Além disso, se não dividirmos o compilador em um analisador léxico e um analisador sintático, o compilador terá
+que antecipar muitos caracteres para decidir o que fazer a seguir. Portanto, podemos dizer que
+um analisador léxico reduz a quantidade de antecipação que um compilador precisa verificar.
+
+## Outros 
+
+Outros são mais simples e diretos, verifique o código:
+
+
+```c
+void next() {
+        ...
+        else if (token == '=') {
+            // analisa '==' e '='
+            if (*src == '=') {
+                src ++;
+                token = Eq;
+            } else {
+                token = Assign;
+            }
+            return;
+        }
+        else if (token == '+') {
+            // analisa '+' e '++'
+            if (*src == '+') {
+                src ++;
+                token = Inc;
+            } else {
+                token = Add;
+            }
+            return;
+        }
+        else if (token == '-') {
+            // analisa '-' e '--'
+            if (*src == '-') {
+                src ++;
+                token = Dec;
+            } else {
+                token = Sub;
+            }
+            return;
+        }
+        else if (token == '!') {
+            // analisa '!='
+            if (*src == '=') {
+                src++;
+                token = Ne;
+            }
+            return;
+        }
+        else if (token == '<') {
+            // analisa '<=', '<<' ou '<'
+            if (*src == '=') {
+                src ++;
+                token = Le;
+            } else if (*src == '<') {
+                src ++;
+                token = Shl;
+            } else {
+                token = Lt;
+            }
+            return;
+        }
+        else if (token == '>') {
+            // analisa '>=', '>>' ou '>'
+            if (*src == '=') {
+                src ++;
+                token = Ge;
+            } else if (*src == '>') {
+                src ++;
+                token = Shr;
+            } else {
+                token = Gt;
+            }
+            return;
+        }
+        else if (token == '|') {
+            // analisa '|' ou '||'
+            if (*src == '|') {
+                src ++;
+                token = Lor;
+            } else {
+                token = Or;
+            }
+            return;
+        }
+        else if (token == '&') {
+            // analisa '&' e '&&'
+            if (*src == '&') {
+                src ++;
+                token = Lan;
+            } else {
+                token = And;
+            }
+            return;
+        }
+        else if (token == '^') {
+            token = Xor;
+            return;
+        }
+        else if (token == '%') {
+            token = Mod;
+            return;
+        }
+        else if (token == '*') {
+            token = Mul;
+            return;
+        }
+        else if (token == '[') {
+            token = Brak;
+            return;
+        }
+        else if (token == '?') {
+            token = Cond;
+            return;
+        }
+        else if (token == '~' || token == ';' || token == '{' || token == '}' || token == '(' || token == ')' || token == ']' || token == ',' || token == ':') {
+            // retorna diretamente o caractere como token;
+            return;
+        }
+
+        ...
+}
+
+```
