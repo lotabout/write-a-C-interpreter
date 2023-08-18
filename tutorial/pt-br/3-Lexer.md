@@ -496,3 +496,86 @@ void next() {
 }
 
 ```
+
+## Palavras-chave e Funções Embutidas
+
+Palavras-chave como `if`, `while` ou `return` são especiais porque são conhecidas
+pelo compilador antecipadamente. Não podemos tratá-las como identificadores normais
+por causa dos significados especiais nelas. Existem duas maneiras de lidar com isso:
+
+1. Permitir que o analisador léxico as interprete e retorne um token para identificá-las.
+2. Tratá-las como identificador normal, mas armazená-las na tabela de símbolos
+   antecipadamente.
+
+Escolhemos a segunda opção: adicionar identificadores correspondentes à tabela de símbolos
+antecipadamente e definir as propriedades necessárias (por exemplo, o tipo `Token` que mencionamos). Assim,
+quando as palavras-chave são encontradas no código-fonte, elas serão interpretadas
+como identificadores, mas como já existem na tabela de símbolos, podemos saber
+que são diferentes dos identificadores normais.
+
+Funções embutidas são semelhantes. Elas são apenas diferentes nas informações internas.
+Na função principal, adicione o seguinte:
+
+```c
+// tipos de variável/função
+enum { CHAR, INT, PTR };
+int *idmain;                  // a função `main`
+int main(int argc, char **argv) {
+    ...
+
+    src = "char else enum if int return sizeof while "
+          "open read close printf malloc memset memcmp exit void main";
+
+    // adiciona palavras-chave à tabela de símbolos
+    i = Char;
+    while (i <= While) {
+        next();
+        current_id[Token] = i++;
+    }
+
+    // adiciona biblioteca à tabela de símbolos
+    i = OPEN;
+    while (i <= EXIT) {
+        next();
+        current_id[Class] = Sys;
+        current_id[Type] = INT;
+        current_id[Value] = i++;
+    }
+
+    next(); current_id[Token] = Char; // lida com o tipo void
+    next(); idmain = current_id; // mantém o rastreamento de main
+
+    ...
+    program();
+    return eval();
+}
+```
+## Código
+
+Você pode conferir o código no
+
+[Github](https://github.com/lotabout/write-a-C-interpreter/tree/step-2), ou
+clone com:
+
+```
+git clone -b step-2 https://github.com/lotabout/write-a-C-interpreter
+```
+
+Executar o código resultará em 'Segmentation Fault' porque tentará
+executar a máquina virtual que construímos no capítulo anterior, o que não
+funcionará porque não contém nenhum código executável.
+
+## Resumo
+
+1. O analisador léxico é usado para pré-processar o código-fonte, de modo a reduzir a
+complexidade do analisador sintático.
+
+2. O analisador léxico também é um tipo de compilador que consome código-fonte e produz
+fluxo de tokens.
+
+3. `lookahead(k)` é usado para determinar completamente o significado do atual
+caractere/token.
+
+4. Como representar identificador e tabela de símbolos.
+
+Discutiremos sobre o analisador sintático recursivo de cima para baixo. Até mais :)
