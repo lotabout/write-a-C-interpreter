@@ -1,11 +1,11 @@
 In this chapter we will have an overview of the compiler's structure.
 
-Before we start, I'd like to restress that it is **interperter** that we want
+Before we start, I'd like to restress that it is **interpreter** that we want
 to build. That means we can run a C source file just like a script. It is
 chosen mainly for two reasons:
 
 1. Interpreter differs from Compiler only in code generation phase, thus we'll
-   still learn all the core techniques of building a compiler(such as lexical
+   still learn all the core techniques of building a compiler (such as lexical
    analyzing and parsing).
 2. We will build our own virtual machine and assembly instructions, that would
    help us to understand how computers work.
@@ -30,15 +30,15 @@ Thus we will build our interpreter in the following steps:
 
 1. Build our own virtual machine and instruction set. This is the target
    platform that will be using in our code generation phase.
-2. Build our own lexer for C compiler.
-3. Write a recusion descent parser on our own.
+2. Build our own lexer for the C compiler.
+3. Write a recursive descent parser on our own.
 
 ## Skeleton of our compiler
 
 
 Modeling after c4, our compiler includes 4 main functions:
 
-1. `next()` for lexical analysis; get the next token; will ignore spaces tabs
+1. `next()` for lexical analysis; get the next token; it will ignore spaces, tabs
    etc.
 2. `program()` main entrance for parser.
 3. `expression(level)`: parser expression; level will be explained in later
@@ -135,14 +135,14 @@ We'll fill them out step by step in later chapters.
 
 The code for this chapter can be downloaded from
 [Github](https://github.com/lotabout/write-a-C-interpreter/tree/step-0), or
-clone by:
+be cloned by:
 
 ```
 git clone -b step-0 https://github.com/lotabout/write-a-C-interpreter
 ```
 
 Note that I might fix bugs later, and if there is any incosistance between the
-artical and the code branches, follow the article. I would only update code in
+article and the code branches, follow the article. I would only update code in
 the master branch.
 
 ## Summary
