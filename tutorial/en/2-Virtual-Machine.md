@@ -8,7 +8,7 @@ way way simpler one.
 ## How computer works internally
 
 There are three components we need to care about: CPU, registers and memory.
-Code(or assembly instruction) are stored in the memory as binary data; CPU
+Code(or assembly instructions) are stored in memory as binary data; CPU
 will retrieve the instruction one by one and execute them; the running states
 of the machine is stored in registers.
 
@@ -25,12 +25,12 @@ program.
 
 The benefit of virtual memory is that it can hide the details of a physical
 memory from the programs. For example, in 32bit machine, all the available
-memory address is `2^32 = 4G` while the actaul physical memory may be only
+memory address is `2^32 = 4G` while the actual physical memory may be only
 `256M`. The program will still think that it can have `4G` memory to use, the
 OS will map them to physical ones.
 
 Of course, you don't need to understand the details about that. But what you
-should understand that a program's usable memory is partioned into several
+should understand is that a program's usable memory is partioned into several
 segments:
 
 1. `text` segment: for storing code(instructions).
@@ -39,9 +39,9 @@ segments:
 3. `bss` segment: for storing un-initialized data. For example `int i[1000];`
    does't need to occupy `1000*4` bytes, because the actual values in the
    array don't matter, thus we can store them in `bss` to save some space.
-4. `stack` segment: used to handling the states of function calls, such as
+4. `stack` segment: used for handling the states of function calls, such as
    calling frames and local variables of a function.
-5. `heap` segment: use to allocate memory dynamically for program.
+5. `heap` segment: used to allocate memory dynamically for program.
 
 An example of the layout of these segments here:
 
@@ -65,7 +65,7 @@ An example of the layout of these segments here:
 ```
 
 Our virtual machine tends to be as simple as possible, thus we don't care
-about the `bss` and `heap`. Our interperter don't support the initialization
+about the `bss` and `heap`. Our interperter doesn't support the initialization
 of data, thus we'll merge the `data` and `bss` segment. More over, we only use
 `data` segment for storing string literals.
 
@@ -75,9 +75,9 @@ itself is also a program which had its heap allocated by our computer. We can
 tell the program that we want to interpret to utilize the interpreter's heap
 by introducing an instruction `MSET`. I won't say it is cheating because it
 reduces the VM's complexity without reducing the knowledge we want to learn
-about compiler.
+about the compiler.
 
-Thus we adds the following codes in the global area:
+Thus we add the following code in the global area:
 
 ```c
 int *text,            // text segment
@@ -134,13 +134,13 @@ of them in real computers while our VM uses only 4:
    element to the stack, `SP` decreases.
 3. `BP`: base pointer, points to some elements on the stack. It is used in
    function calls.
-4. `AX`: a general register that we used to store the result of an
+4. `AX`: a general register that we use to store the result of an
    instruction.
 
 In order to fully understand why we need these registers, you need to
-understand what states will a computer need to store during computation. They
-are just a place to store value. You will get a better understanding after
-finished this chapter.
+understand what states a computer will need to store during computation. They
+are just a place to store values. You will get a better understanding after
+we finish this chapter.
 
 Well, add some code into the global area:
 
@@ -149,7 +149,7 @@ int *pc, *bp, *sp, ax, cycle; // virtual machine registers
 ```
 
 And add the initialization code in the `main` function. Note that `pc` should
-points to the `main` function of the program to be interpreted. But we don't
+point to the `main` function of the program to be interpreted. But we don't
 have any code generation yet, thus skip for now.
 
 ```c
@@ -168,8 +168,8 @@ instruction sets. We'll save that for a new section.
 
 ## Instruction Set
 
-Instruction set is a set of instruction that CPU can understand, it is the
-language we need to master in order to talk to CPU. We are going to design a
+Instruction set is a set of instruction that the CPU can understand, it is the
+language we need to master in order to talk to the CPU. We are going to design a
 language for our VM, it is based on x86 instruction set yet much simpler.
 
 We'll start by adding an `enum` type listing all the instructions that our VM
@@ -183,21 +183,21 @@ enum { LEA ,IMM ,JMP ,CALL,JZ  ,JNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PUSH,
 ```
 
 These instruction are ordered intentionally as you will find out later that
-instructions with arguments comes first while those without arguments comes
+instructions with arguments come first while those without arguments come
 after. The only benefit here is for printing debug info. However we will not
-rely on this order to introduce them.
+rely on this in order to introduce them.
 
 ### MOV
 
-`MOV` is one of the most fundamental instructions you'll met. Its job is to
-move data into registers or the memory, kind of like the assignment expression
+`MOV` is one of the most fundamental instructions you'll meet. It's job is to
+move data into registers or memory, kind of like the assignment expression
 in C. There are two arguments in `x86`'s `MOV` instruction: `MOV dest,
 source`(Intel style), `source` can be a number, a register or a memory
 address.
 
 But we won't follow `x86`. On one hand our VM has only one general
 register(`AX`), on the other hand it is difficult to determine the type of the
-arguments(wheter it is number, register or adddress). Thus we tear `MOV` apart
+arguments(wheter it is a number, register or address). Thus we tear `MOV` apart
 into 5 pieces:
 
 1. `IMM <num>` to put immediate `<num>` into register `AX`.
@@ -211,7 +211,7 @@ into 5 pieces:
 What? I want one `MOV`, not 5 instruction just to replace it! Don't panic!
 You should know that `MOV` is actually a set of instruction that depends on
 the `type` of its arguments, so you got `MOVB` for bytes and `MOVW` for words,
-etc. Now `LC/SC` and `LI/SI` don't seems that bad, uha?
+etc. Now `LC/SC` and `LI/SI` don't seems that bad, huh?
 
 Well the most important reason is that by turning `MOV` into 5 sub
 instructions, we reduce the complexity a lot! Only `IMM` will accept an
@@ -269,7 +269,7 @@ stores the argument of `JMP` instruction, i.e. the `<addr>`.
 
 ### JZ/JNZ
 
-We'll need conditional jump so as to implement `if` statement. Only two
+We'll need a conditional jump so as to implement `if` statement. Only two
 are needed here to jump when `AX` is `0` or not.
 
 ```c
@@ -378,7 +378,7 @@ mov     ebp, esp
 sub     1, esp       ; save stack for variable: i
 ```
 
-Will be translated into:
+Translates to:
 
 ```c
 else if (op == ENT)  {*--sp = (int)bp; bp = sp; sp = sp - *pc++;}      // make new stack frame
@@ -403,7 +403,7 @@ else if (op == ADJ)  {sp = sp + *pc++;}                                // add es
 
 ### LEV
 
-In case you don't notice, our instruction set don't have `POP`. `POP` in our
+In case you don't notice, our instruction set doesn't have `POP`. `POP` in our
 compiler would only be used when function call returns. Which is like this:
 
 ```
@@ -423,7 +423,7 @@ else if (op == LEV)  {sp = bp; bp = (int *)*sp++; pc = (int *)*sp++;}  // restor
 
 ### LEA
 
-The instructions introduced above try to solve the problem of
+The instructions introduced above tries to solve the problem of
 creating/destructing calling frames, one thing left here is how to fetch the
 arguments *inside* sub function.
 
