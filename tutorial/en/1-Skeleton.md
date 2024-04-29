@@ -148,5 +148,5 @@ the master branch.
 ## Summary
 
 After some boring typing, we have the simplest compiler: a do-nothing
-compiler. In next chapter, we will implement the `eval` function, i.e. our own
+compiler. In the next chapter, we will implement the `eval` function, i.e. our own
 virtual machine. See you then.
