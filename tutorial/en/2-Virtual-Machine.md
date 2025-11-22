@@ -303,14 +303,14 @@ We've commented out `RET` because we'll replace it with `LEV` later.
 In practice the compiler should deal with more: how to pass the arguments to
 a function? How to return the data from the function?
 
-Our convention here about returning value is to store it into `AX` no matter
-you're returning a value or a memory address. Then how about argument?
+Our convention here about returning a value is to store it into `AX` no matter
+if you're returning a value or a memory address. Then what about arguments?
 
-Different language has different convension, here is the standard for C:
+Different languages have different conventions, here is the standard for C:
 
-1. It is the caller's duty to push the arguments onto stack.
-2. After the function call returns, caller need to pop out the arguments.
-3. The arguments are pushed in the reversed order.
+1. It is the caller's duty to push the arguments onto the stack.
+2. After the function call returns, the caller has to pop out the arguments.
+3. The arguments are pushed in the reverse order.
 
 Note that we won't follow rule 3. Now let's check how C standard works(from
 [Wikipedia](https://en.wikipedia.org/wiki/X86_calling_conventions)):
