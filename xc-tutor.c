@@ -7,7 +7,11 @@
 #include <string.h>
 #include <stdint.h>
 #include <fcntl.h>
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #define int intptr_t
 
 int token;                    // current token
