@@ -2,7 +2,11 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #include <fcntl.h>
 #define int long long // to work with 64bit address
 
